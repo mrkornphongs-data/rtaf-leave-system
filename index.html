@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเขียนใบลาอิเล็กทรอนิกส์ (แบบ ๗, แบบ ๓ และ แบบ ๖) - ระบบบริหารวันลาราชการ</title>
+    <meta name="description" content="ระบบออกใบลาพักผ่อนประจำปี (แบบ ๗), ใบลาป่วย (แบบ ๓) และใบลากิจ (แบบ ๖) ตามระเบียบงานสารบรรณราชการและทหาร พร้อมคำนวณวันทำการ ทะเบียนคุมใบลา และประวัติกำลังพล">
+    
+    <!-- Google Fonts: Sarabun, Outfit, Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="css/style.css?v=2.4">
+</head>
+<body>
+
+    <!-- ==========================================================================
+         HAMBURGER NAVIGATION DRAWER & BACKDROP
+         ========================================================================== -->
+    <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeSidebarMenu()"></div>
+
+    <aside class="sidebar-drawer" id="sidebarDrawer" aria-label="แถบเมนูนำทางหลัก">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <div class="brand-icon" id="drawerBrandIcon">📋</div>
+                <div class="drawer-brand-text">
+                    <div class="drawer-app-title" id="drawerAppTitle">ระบบเขียนใบลาอิเล็กทรอนิกส์</div>
+                    <div class="drawer-app-subtitle" id="drawerAppSubtitle">งานสารบรรณและทะเบียนกำลังพล</div>
+                </div>
+            </div>
+            <button type="button" class="drawer-close-btn" onclick="closeSidebarMenu()" title="ปิดเมนู" aria-label="ปิดเมนู">✕</button>
+        </div>
+
+        <!-- Current User Card inside Drawer -->
+        <div class="drawer-user-card">
+            <div class="drawer-user-avatar">👤</div>
+            <div class="drawer-user-info">
+                <div class="drawer-user-name" id="drawerUserName">ผู้ดูแลระบบ</div>
+                <div class="drawer-user-role" id="drawerUserRole">🛡️ ผู้ดูแลระบบ (Admin)</div>
+            </div>
+            <button type="button" class="btn-drawer-logout" id="btnLogoutDrawer" onclick="logoutUser()" title="ออกจากระบบ">
+                🚪 ออกจากระบบ
+            </button>
+        </div>
+
+        <!-- Drawer Menu List -->
+        <div class="drawer-body">
+            <div class="drawer-section-label">ภาพรวมและสถิติ (Overview & Analytics)</div>
+            <nav class="drawer-menu-list">
+                <button class="tab-btn active" data-tab="dashboard" onclick="handleMenuClick('dashboard')">
+                    <div class="menu-item-icon-box">📊</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">แดชบอร์ด</span>
+                        <span class="menu-item-desc">สถิติและภาพรวมวันลา</span>
+                    </div>
+                    <span class="menu-item-badge" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">สถิติ</span>
+                </button>
+
+                <div class="drawer-divider"></div>
+                <div class="drawer-section-label">แบบฟอร์มการขอลา (Leave Forms)</div>
+                <button class="tab-btn" data-tab="create" onclick="handleMenuClick('create')">
+                    <div class="menu-item-icon-box">🌴</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ลาพักผ่อน</span>
+                        <span class="menu-item-desc">ใบลาพักผ่อนประจำปี</span>
+                    </div>
+                    <span class="menu-item-badge badge-vacation">แบบ ๗</span>
+                </button>
+                <button class="tab-btn" data-tab="create-sick" onclick="handleMenuClick('create-sick')">
+                    <div class="menu-item-icon-box">🩺</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ลาป่วย</span>
+                        <span class="menu-item-desc">ใบลาป่วย</span>
+                    </div>
+                    <span class="menu-item-badge badge-sick">แบบ ๓</span>
+                </button>
+                <button class="tab-btn" data-tab="create-personal" onclick="handleMenuClick('create-personal')">
+                    <div class="menu-item-icon-box">💼</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ลากิจธุระ</span>
+                        <span class="menu-item-desc">ใบลากิจ</span>
+                    </div>
+                    <span class="menu-item-badge badge-personal">แบบ ๖</span>
+                </button>
+
+                <div class="drawer-divider"></div>
+                <div class="drawer-section-label">การจัดการและระบบ (Management)</div>
+
+                <button class="tab-btn" data-tab="history" onclick="handleMenuClick('history')">
+                    <div class="menu-item-icon-box">📑</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ทะเบียนคุมใบลา</span>
+                        <span class="menu-item-desc">ประวัติและคุมการอนุมัติ</span>
+                    </div>
+                </button>
+                <button class="tab-btn" data-tab="personnel" onclick="handleMenuClick('personnel')">
+                    <div class="menu-item-icon-box">👥</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ทะเบียนกำลังพล</span>
+                        <span class="menu-item-desc">ข้อมูลข้าราชการและสิทธิลา</span>
+                    </div>
+                </button>
+                <button class="tab-btn" data-tab="settings" onclick="handleMenuClick('settings')">
+                    <div class="menu-item-icon-box">⚙️</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ตั้งค่าระบบ</span>
+                        <span class="menu-item-desc">หน่วยงาน, Logo และสำรองข้อมูล</span>
+                    </div>
+                </button>
+                <button class="tab-btn" data-tab="permissions" onclick="handleMenuClick('permissions')">
+                    <div class="menu-item-icon-box">🔐</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">สิทธิ์การใช้งาน</span>
+                        <span class="menu-item-desc">จัดการผู้ใช้งานและกำหนดสิทธิ์</span>
+                    </div>
+                </button>
+                <button class="tab-btn" data-tab="audit-log" onclick="handleMenuClick('audit-log')">
+                    <div class="menu-item-icon-box">📜</div>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">ประวัติการใช้งาน</span>
+                        <span class="menu-item-desc">บันทึกกิจกรรมและ Audit Log</span>
+                    </div>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Drawer Footer with Developer Credit -->
+        <div class="drawer-footer">
+            <div class="drawer-footer-top">
+                <span>ระบบสารบรรณและวันลาอิเล็กทรอนิกส์</span>
+                <span class="drawer-version-tag">v1.2</span>
+            </div>
+            <div class="drawer-credit-dev">พัฒนาและดูแลระบบโดย พันจ่าอากาศเอก กรณ์พงษ์ สุขเกียรติ์สกุล</div>
+            <div class="drawer-credit-copy">© 2026 RTAF Web Application</div>
+        </div>
+    </aside>
+
+    <!-- ==========================================================================
+         APPLICATION HEADER (CLEAN HAMBURGER BAR)
+         ========================================================================== -->
+    <header class="app-header">
+        <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
+            <button class="hamburger-btn" id="btnHamburger" onclick="toggleSidebarMenu()" title="เปิดเมนูหลัก (Hamburger Menu)" aria-label="เปิดเมนูหลัก">
+                <span class="hamburger-box">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </span>
+                <span class="hamburger-label">เมนู</span>
+            </button>
+
+            <div class="brand-section">
+                <div class="brand-icon" id="headerBrandIcon">📋</div>
+                <div>
+                    <div class="app-title" id="headerAppTitle">ระบบเขียนใบลาอิเล็กทรอนิกส์ (แบบ ๗, แบบ ๓ และ แบบ ๖)</div>
+                    <div class="app-subtitle" id="headerAppSubtitle">งานสารบรรณและทะเบียนกำลังพล • ผวสม.กกศ.รร.จอ.ยศ.ทอ.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Active Page Indicator in center -->
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <div class="active-page-pill" id="headerActivePageBadge" onclick="toggleSidebarMenu()" title="คลิกเพื่อเปิดเมนูสลับหน้า">
+                <span class="active-page-dot"></span>
+                <span id="activePageIcon">📊</span>
+                <span id="activePageTitle">แดชบอร์ดสถิติวันลา</span>
+                <span class="active-page-arrow">▾</span>
+            </div>
+        </div>
+
+        <div class="user-header-section">
+            <div class="user-pill-badge" id="currentUserBadge" onclick="logoutUser()" title="คลิกที่ชื่อเพื่อออกจากระบบ">
+                <span class="user-avatar-icon">👤</span>
+                <div class="user-pill-text">
+                    <span class="user-pill-name" id="headerUserName">ผู้ดูแลระบบ</span>
+                    <span class="user-pill-role" id="headerUserRole">Admin</span>
+                </div>
+            </div>
+            <button type="button" class="btn-logout-header" id="btnLogoutHeader" onclick="logoutUser()" style="display: none !important;" aria-hidden="true">
+                <span>🚪</span>
+                <span class="logout-text">ออกจากระบบ</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         TAB 0: แดชบอร์ดภาพรวมและสถิติวันลา (DASHBOARD & ANALYTICS)
+         ========================================================================== -->
+    <div class="main-container tab-content active" id="tab-dashboard" style="max-width: 1400px; margin: 0 auto; padding: 1.5rem 1rem;">
+        <div class="dashboard-wrapper">
+            <!-- Dynamic Dashboard Content (Admin Organization Overview or User Self-Only View) -->
+            <div id="dashboardDynamicContent"></div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 1: เขียนใบลา & พรีวิว A4 แบบ ๗ (CREATE & PREVIEW)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-create">
+        <!-- ฝั่งกรอกข้อมูล (Form Controls) -->
+        <div class="form-panel">
+            <!-- 1. ข้อมูลผู้ขอลา -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>1. ข้อมูลผู้ขอลา</span>
+                    <span class="badge">เลือกดึงข้อมูลอัตโนมัติ</span>
+                </div>
+                <div class="form-group full">
+                    <label for="userSelect">
+                        <span>เลือกจากทะเบียนกำลังพล</span>
+                        <small>ระบบจะดึงตำแหน่งและสิทธิวันลาให้อัตโนมัติ</small>
+                    </label>
+                    <select id="userSelect" onchange="loadPersonData(this.value)" oninput="loadPersonData(this.value)">
+                        <option value="">-- กรอกเอง / เลือกจากกำลังพล --</option>
+                    </select>
+                </div>
+                <div class="form-group full" style="margin-top: 0.75rem;">
+                    <label for="inpDocDate">วันที่เขียนใบลา</label>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <input type="date" id="inpDocDate" onchange="render()" style="max-width: 220px;">
+                        <label style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                            <input type="checkbox" id="chkDocDayBlank" checked onchange="render()">
+                            <span>เว้นช่องวันที่ไว้ (แสดงเฉพาะเดือน และ พ.ศ.)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top: 0.75rem;">
+                    <div class="form-group full">
+                        <label for="inpPlace">เขียนที่</label>
+                        <input type="text" id="inpPlace" value="ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSubject">เรื่อง</label>
+                        <input type="text" id="inpSubject" value="ขอลาพักผ่อนประจำปี" oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpTo">เรียน</label>
+                        <input type="text" id="inpTo" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPronoun">คำสรรพนาม</label>
+                        <select id="inpPronoun" onchange="render()">
+                            <option value="กระผม">กระผม</option>
+                            <option value="ดิฉัน">ดิฉัน</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpRank">ยศ (คำนำหน้า)</label>
+                        <input type="text" id="inpRank" value="ร.ท." oninput="render()" placeholder="เช่น ร.ท., พ.อ.อ.">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpName">ชื่อ - สกุล ผู้ขอลา</label>
+                        <input type="text" id="inpName" value="สมชาย  ใจดี" oninput="handleNameInput(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPosition">ตำแหน่ง</label>
+                        <input type="text" id="inpPosition" value="ประจำ ผวสม.กกศ.ฯ" oninput="handlePosInput(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPosition2">ตำแหน่ง (ต่อ / บรรทัดที่ 2 - ถ้ามี)</label>
+                        <input type="text" id="inpPosition2" value="" placeholder="เช่น ช่วยราชการ ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="render()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpPhone">เบอร์โทรศัพท์ติดต่อ</label>
+                        <input type="text" id="inpPhone" value="081-234-5678">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ช่วงวันลาและการเดินทาง -->
+            <div class="form-section">
+                <div class="form-section-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span>2. กำหนดวันลาและการเดินทาง</span>
+                        <span class="badge">คำนวณวันทำการอัตโนมัติ</span>
+                    </div>
+                </div>
+
+                <!-- กำหนดวันลาช่วงวันต่อเนื่อง -->
+                <div id="sectionDateRange" class="form-grid">
+                    <div class="form-group">
+                        <label for="inpStartDate">ตั้งแต่วันที่</label>
+                        <input type="date" id="inpStartDate" onchange="handleDateChange('start')" oninput="handleDateChange('start')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpEndDate" id="lblEndDate">ถึงวันที่</label>
+                        <input type="date" id="inpEndDate" onchange="handleDateChange('end')" oninput="handleDateChange('end')">
+                    </div>
+                </div>
+
+                <!-- ส่วนข้อมูลร่วม: จำนวนวันลา, จังหวัด, เดินทางไป-กลับ -->
+                <div class="form-grid" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+                    <div class="form-group">
+                        <label for="inpLeaveDays">
+                            <span>จำนวนวันลา (วันทำการ)</span>
+                            <small id="lblLeaveDaysDesc">ไม่นับ ส.-อา.</small>
+                        </label>
+                        <input type="number" id="inpLeaveDays" value="3" min="0" oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpProvince">จะไปที่จังหวัด</label>
+                        <input type="text" id="inpProvince" value="เชียงใหม่" oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpDepartDate">ในวันที่ (เดินทางไป)</label>
+                        <input type="date" id="inpDepartDate" onchange="render()" oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpReturnDate">และจะกลับในวันที่</label>
+                        <input type="date" id="inpReturnDate" onchange="render()" oninput="render()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. สถิติวันลาประจำปีงบประมาณ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>3. สถิติวันลาประจำปีงบประมาณ</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="inpPrevFiscalStartYear">ปีงบฯ ที่แล้ว (๑ ต.ค.)</label>
+                        <input type="text" id="inpPrevFiscalStartYear" value="68" oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPrevFiscalEndYear">ถึง ๓๐ ก.ย.</label>
+                        <input type="text" id="inpPrevFiscalEndYear" value="69" oninput="render()">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="inpPrevYearLeaveDays">ลาปีที่แล้ว รวม (วันทำการ)</label>
+                        <input type="text" id="inpPrevYearLeaveDays" value="" placeholder="เว้นว่างไว้เป็นเส้นประ" oninput="render()">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="inpAccDays">เหลือวันลาสะสม (วันทำการ)</label>
+                        <input type="number" id="inpAccDays" value="" placeholder="เว้นว่างไว้เป็นเส้นประ" min="0" oninput="render()">
+                    </div>
+                    <div class="form-group full" style="display: none;">
+                        <label for="inpCurrentFiscalYear">ในปีงบประมาณนี้</label>
+                        <input type="text" id="inpCurrentFiscalYear" value="69" oninput="render()">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="inpAnnualQuota">สิทธิวันลาประจำปีนี้ (วัน)</label>
+                        <input type="number" id="inpAnnualQuota" value="10" min="0" oninput="render()">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label for="inpPrevLeaveDays">ลามาแล้วปีนี้ (วันทำการ)</label>
+                        <input type="number" id="inpPrevLeaveDays" value="0" min="0" oninput="render()">
+                    </div>
+                    <div class="form-group full" style="display: none; margin-top: 4px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; font-size: 0.9rem; color: #4b5563;">
+                            <input type="checkbox" id="chkBlankStatDays" checked onchange="render()">
+                            <span>เว้นช่องสถิติวันลาไว้ (ไม่ต้องใส่ข้อมูลในแบบพิมพ์)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- สรุปสิทธิวันลา -->
+                <div class="quota-pill-group" style="margin-top: 0.65rem;">
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillTotalQuota">15 วัน</div>
+                        <div class="pill-lbl">สิทธิ์การลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillRemaining">12 วัน</div>
+                        <div class="pill-lbl">คงเหลือวันลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillPrevTaken">0 วัน</div>
+                        <div class="pill-lbl">ลาไปแล้ว</div>
+                    </div>
+                    <div class="quota-pill active">
+                        <div class="pill-val" id="pillThisLeave">3 วัน</div>
+                        <div class="pill-lbl">ลาครั้งนี้</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ข้อมูลสายการบังคับบัญชา & ผู้สั่งการ -->
+            <div class="form-section">
+                <div class="form-section-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span>4. สายการบังคับบัญชา & การอนุมัติ</span>
+                        <span id="badgeEndorseStatus" class="badge" style="display: none; background: #e0f2fe; color: #0369a1; font-weight: normal; font-size: 0.75rem;">ผู้ขอลาเป็น หน. เสนอตรงผู้มีอำนาจสั่งการ</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="syncSettingsToSection4('create')" title="ดึงข้อมูลสายการบังคับบัญชาจากหน้าตั้งค่าระบบ" style="padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 500;">
+                        🔄 ดึงจากหน้าตั้งค่า
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full" style="display: none;">
+                        <label for="inpStatSignPos">ตำแหน่งผู้ตรวจสอบสถิติวันลา (เว้นว่างได้)</label>
+                        <input type="text" id="inpStatSignPos" value="" placeholder="เว้นว่างไว้เป็นเส้นประ (ไม่แสดงข้อความ จนท.)" oninput="render()">
+                    </div>
+                    <div class="form-group" id="fGroupEndorseTo">
+                        <label for="inpEndorseTo">เรียน (เสนอพิจารณา)</label>
+                        <input type="text" id="inpEndorseTo" value="หก.กกศ.รร.จอ.ยศ.ทอ." oninput="render()">
+                    </div>
+                    <div class="form-group" id="fGroupEndorseRank">
+                        <label for="inpEndorseRank">ยศผู้บังคับบัญชาชั้นต้น</label>
+                        <input type="text" id="inpEndorseRank" value="น.ท." oninput="render()">
+                    </div>
+                    <div class="form-group full" id="fGroupEndorsePos">
+                        <label for="inpEndorsePos">ตำแหน่งผู้บังคับบัญชาชั้นต้น (ตำแหน่ง 1)</label>
+                        <input type="text" id="inpEndorsePos" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="render()">
+                    </div>
+                    <div class="form-group full" id="fGroupEndorsePos2">
+                        <label for="inpEndorsePos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpEndorsePos2" value="" placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="render()">
+                    </div>
+                    <div class="form-group full" id="fGroupEndorseMonth">
+                        <label for="inpEndorseMonth">เดือนที่ลงนามเสนอ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpEndorseMonth">
+                            <input type="hidden" id="inpEndorseMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpEndorseMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpEndorseMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpEndorseMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpOrderRank">ยศผู้มีอำนาจสั่งการ</label>
+                        <input type="text" id="inpOrderRank" value="น.ท." oninput="render()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpOrderPos1">ตำแหน่ง 1 (ทำการแทน)</label>
+                        <input type="text" id="inpOrderPos1" value="รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน" oninput="render()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpOrderPos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpOrderPos2" value="หก.กกศ.รร.จอ.ยศ.ทอ." placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="render()">
+                    </div>
+                    <div class="form-group full" id="fGroupApprovalMonth">
+                        <label for="inpApprovalMonth">เดือนที่ลงนามอนุมัติ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpApprovalMonth">
+                            <input type="hidden" id="inpApprovalMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpApprovalMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpApprovalMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpApprovalMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ปุ่มดำเนินการหลัก -->
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+                <button class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;" onclick="window.print()">
+                    🖨️ พิมพ์ใบลาพักผ่อน / บันทึก PDF
+                </button>
+                <button class="btn btn-success btn-block" onclick="saveLeaveApplication()">
+                    💾 บันทึกใบลาลงทะเบียนคุม
+                </button>
+            </div>
+        </div>
+
+        <!-- ฝั่งพรีวิวเอกสาร A4 (แบบ ๗ ตามรูปแบบ ทอ.) -->
+        <div class="preview-panel-wrap">
+            <div class="preview-toolbar non-printable">
+                <div class="toolbar-info">
+                    <strong>พรีวิวแบบ ๗ (ขนาดกระดาษ A4 ตามระเบียบ ทอ.)</strong>
+                    <span style="color: #94a3b8;">• 1 หน้ากระดาษมาตรฐาน</span>
+                </div>
+                <div class="toolbar-actions">
+                    <label style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" id="chkThaiNum" checked onchange="toggleNumeralFormat()">
+                        <span>แสดงเป็นเลขไทย (๑ ๒ ๓)</span>
+                    </label>
+                    <button class="btn btn-sm btn-primary" onclick="window.print()">
+                        🖨️ สั่งพิมพ์
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <div class="a4-page" id="paper">
+                    <!-- แบบ ๗ (ชิดขวาบน) -->
+                    <div class="form7-top-right">แบบ ๗</div>
+                    
+                    <!-- หัวข้อกึ่งกลาง ขีดเส้นใต้ -->
+                    <div class="form7-main-title" style="font-family: 'TH SarabunPSK', 'THSarabunPSK', 'TH Sarabun PSK', 'TH Sarabun New', 'Sarabun', sans-serif; font-size: 18pt; font-weight: bold;">ใบลาพักผ่อนประจำปี</div>
+
+                    <!-- เขียนที่ และ วันที่ (เยื้องขวา) -->
+                    <div class="form7-meta-right">
+                        เขียนที่ <span class="dotted-line" id="pPlace" style="min-width: 170px;">ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span><br>
+                        วันที่ <span class="dotted-line" id="pDocD" style="min-width: 35px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span style="margin-left: 4px;">เดือน</span> <span class="dotted-line" id="pDocM" style="min-width: 45px; padding: 0 4px;">ก.ย.</span>
+                        <span style="margin-left: 6px;">พ.ศ.</span> <span class="dotted-line" id="pDocY" style="min-width: 30px; padding: 0 4px;">69</span>
+                    </div>
+
+                    <!-- เรื่อง และ เรียน -->
+                    <div class="form7-line-header">
+                        เรื่อง &nbsp; <span id="pSubject">ขอลาพักผ่อนประจำปี</span>
+                    </div>
+                    <div class="form7-line-header" style="margin-bottom: 6px;">
+                        เรียน &nbsp; <span id="pTo">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span>
+                    </div>
+
+                    <!-- ย่อหน้าคำขอลา 4 บรรทัดตรงตามต้นฉบับ ทอ. (ทุกบรรทัดอยู่แถวเดียวกัน ไม่มีการตัดคำ) -->
+                    <div class="form7-body-container" id="pBodyContainer">
+                        <!-- บรรทัดที่ 1: ด้วยกระผม... ตำแหน่ง... (รองรับตัดลงมาอีกบรรทัดเมื่อตำแหน่งยาว) -->
+                        <div class="form7-body-row indent" id="pApplicantRow1">
+                            <span>ด้วย<span id="pPronoun">กระผม</span></span>
+                            <span class="dotted-line fill-flex" id="pName">ร.ท.สมชาย&nbsp;&nbsp;ใจดี</span>
+                            <span id="pPosInlineLabel">ตำแหน่ง</span>
+                            <span class="dotted-line fill-flex" id="pPosInline">ประจำ ผวสม.กกศ.ฯ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: ตำแหน่ง (กรณีตัดลงมาอีกหนึ่งบรรทัด) -->
+                        <div class="form7-body-row" id="pApplicantRow2" style="display: none;">
+                            <span id="pPosLine2Label">ตำแหน่ง</span>
+                            <span class="dotted-line fill-flex" id="pPosLine2">&nbsp;</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: ตำแหน่งส่วนต่อ (กรณีตำแหน่งยาวมากมีบรรทัดที่ 2 เพิ่มเติม) -->
+                        <div class="form7-body-row" id="pApplicantRow3" style="display: none;">
+                            <span class="dotted-line fill-flex" id="pPosLine3">&nbsp;</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: ขออนุญาตลาหยุดราชการเพื่อพักผ่อนประจำปี มีกำหนด...วัน ตั้งแต่วันที่...เดือน...พ.ศ.... -->
+                        <div class="form7-body-row">
+                            <span>ขออนุญาตลาหยุดราชการเพื่อพักผ่อนประจำปี มีกำหนด</span>
+                            <span class="dotted-line fill-flex" id="pDays" style="max-width: 45px;">๓</span>
+                            <span>วัน ตั้งแต่วันที่</span>
+                            <span class="dotted-line fill-flex" id="pSD" style="max-width: 35px;">-</span>
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pSM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pSY" style="max-width: 40px; padding: 0 4px;">69</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: ถึงวันที่...เดือน...พ.ศ.... ในระหว่างลานี้ กระผม จะไปที่จังหวัด... -->
+                        <div class="form7-body-row">
+                            <span id="pDateConnector">ถึงวันที่</span>
+                            <span class="dotted-line fill-flex" id="pED" style="max-width: 35px;">-</span>
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pEM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pEY" style="max-width: 40px; padding: 0 4px;">69</span>
+                            <span style="margin-left: 5px;">ในระหว่างลานี้ <span id="pPronounTravel">กระผม</span>จะไปที่จังหวัด</span>
+                            <span class="dotted-line fill-flex" id="pProv">เชียงใหม่</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 4: ในวันที่...เดือน...พ.ศ.... และจะกลับในวันที่...เดือน...พ.ศ.... -->
+                        <div class="form7-body-row">
+                            <span>ในวันที่</span>
+                            <span class="dotted-line fill-flex" id="pDepartD" style="max-width: 35px;">-</span>
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pDepartM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pDepartY" style="max-width: 40px; padding: 0 4px;">69</span>
+                            <span style="margin-left: 5px;">และจะกลับในวันที่</span>
+                            <span class="dotted-line fill-flex" id="pReturnD" style="max-width: 35px;">-</span>
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pReturnM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pReturnY" style="max-width: 40px; padding: 0 4px;">69</span>
+                        </div>
+                    </div>
+
+                    <!-- ควรมิควรแล้วแต่จะกรุณา -->
+                    <div class="form7-closing">
+                        ควรมิควรแล้วแต่จะกรุณา
+                    </div>
+
+                    <!-- ลายมือชื่อผู้ขอลา -->
+                    <div class="form7-applicant-sign">
+                        (ลงชื่อ) &nbsp; <span id="pSignRank" style="font-weight: normal;">ร.ท.</span><span id="pSignRankSpacer">&nbsp;</span><span class="dotted-line" id="pSignLine" style="min-width: 180px;">&nbsp;</span>
+                    </div>
+
+                    <!-- เส้นแบ่งคั่นหน้า -->
+                    <hr class="form7-hr">
+
+                    <!-- ส่วนสถิติวันลา -->
+                    <div class="form7-stat-section">
+                        <!-- บรรทัดที่ 1: ในปีงบประมาณที่แล้ว ตั้งแต่ ๑ ต.ค. ๖๘ ถึง ๓๐ ก.ย. ๖๙ ได้ลาพักผ่อนประจำปี (เส้นประเต็มช่อง ๖๘ และ ๖๙ ชิดกั้นหน้า กั้นหลัง) -->
+                        <div class="form7-stat-row indent">
+                            <span>ในปีงบประมาณที่แล้ว ตั้งแต่ ๑ ต.ค.</span>
+                            <span class="dotted-line fill-flex" id="pStatPrevYearStart">68</span>
+                            <span>ถึง ๓๐ ก.ย.</span>
+                            <span class="dotted-line fill-flex" id="pStatPrevYearEnd">69</span>
+                            <span>ได้ลาพักผ่อนประจำปี</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: รวม...วันทำการ เหลือวันลาพักผ่อนสะสม...วันทำการ (ไม่ใส่ข้อมูล เว้นเป็นเส้นประ) -->
+                        <div class="form7-stat-row">
+                            <span>รวม</span>
+                            <span class="dotted-line fill-flex" id="pStatPrevYearDays" style="min-width: 45px; max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ เหลือวันลาพักผ่อนสะสม</span>
+                            <span class="dotted-line fill-flex" id="pStatAccDays" style="min-width: 45px; max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: ในปีงบประมาณนี้ (ชื่อคนลา) ได้ลาพักผ่อนประจำปีมาแล้ว (ไม่ใส่ข้อมูล เว้นเป็นเส้นประ) -->
+                        <div class="form7-stat-row indent" id="pStatRow3" style="margin-top: 5px;">
+                            <span>ในปีงบประมาณนี้</span>
+                            <span class="dotted-line" id="pStatPersonName">ร.ท.สมชาย&nbsp;&nbsp;ใจดี</span>
+                            <span>ได้ลาพักผ่อนประจำปีมาแล้ว</span>
+                            <span class="dotted-line fill-flex" id="pStatCurTaken">&nbsp;</span>
+                            <span>วันทำการ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 4: ทั้งครั้งนี้รวมเป็น...วันทำการ เหลือวันลาพักผ่อน...วันทำการ (ไม่ใส่ข้อมูล เว้นเป็นเส้นประ) -->
+                        <div class="form7-stat-row">
+                            <span>ทั้งครั้งนี้รวมเป็น</span>
+                            <span class="dotted-line fill-flex" id="pStatTotalTaken" style="min-width: 45px; max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ เหลือวันลาพักผ่อน</span>
+                            <span class="dotted-line fill-flex" id="pStatRemaining" style="min-width: 45px; max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ</span>
+                        </div>
+
+                        <!-- ลายมือชื่อผู้ตรวจสอบสถิติวันลา -->
+                        <div class="form7-stat-sign">
+                            <div class="form7-stat-sign-grid">
+                                <span>(ลงชื่อ)&nbsp;</span>
+                                <span class="dotted-line" style="min-width: 180px;">&nbsp;</span>
+
+                                <span>ตำแหน่ง&nbsp;</span>
+                                <span class="dotted-line" id="pStatSignPos" style="min-width: 180px;">&nbsp;</span>
+
+                                <span></span>
+                                <span class="date-center" id="pStatSignDate"><span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 35px;">&nbsp;</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนสายการบังคับบัญชา และ คำสั่งอนุมัติ -->
+                    <div class="form7-approval-section" id="pApprovalSection">
+                        <!-- เสนอผู้บังคับบัญชาชั้นต้น -->
+                        <div class="form7-endorse-block" id="pEndorseBlock">
+                            <div class="form7-endorse-to">เรียน &nbsp; <span id="pEndorseTo">หก.กกศ.รร.จอ.ยศ.ทอ.</span></div>
+                            <div class="form7-endorse-sub"><span class="endorse-sub-spacer" id="pEndorseSubSpacer" aria-hidden="true">เรียน &nbsp; หก.ก</span>เพื่อพิจารณาอนุญาต</div>
+                            <div class="form7-endorse-rank-row" id="pEndorseRankRow"><span class="endorse-sub-spacer" id="pEndorseRankSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจา</span><span id="pEndorseRank">น.ท.</span></div>
+                            <div class="form7-endorse-pos-row">
+                                <span class="endorse-sub-spacer" id="pEndorsePosSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจาน.ท.</span><div class="endorse-pos-block">
+                                    <div id="pEndorsePos1">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div id="pEndorsePos2" style="display: none;"></div>
+                                    <div class="endorse-date-center" id="pEndorseDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- คำสั่งผู้มีอำนาจสั่งการ -->
+                        <div class="form7-order-block" id="pOrderBlock">
+                            <div class="form7-order-text">- อนุญาต</div>
+                            <div class="form7-order-rank-row" id="pOrderRankRow"><span class="endorse-sub-spacer" id="pOrderRankSpacer" aria-hidden="true">- อนุญา</span><span id="pOrderRank">น.ท.</span></div>
+                            <div class="form7-order-pos-row">
+                                <span class="endorse-sub-spacer" id="pOrderPosSpacer" aria-hidden="true">- อนุญาน.ท.</span><div class="order-pos-block">
+                                    <div id="pOrderPos1">รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน</div>
+                                    <div id="pOrderPos2">หก.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div class="order-date-center" id="pOrderDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB: เขียนใบลา & พรีวิว A4 แบบ ๓ (SICK LEAVE - CREATE & PREVIEW)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-create-sick">
+        <!-- ฝั่งกรอกข้อมูล (Form Controls) สำหรับใบลาป่วย แบบ ๓ -->
+        <div class="form-panel">
+            <!-- 1. ข้อมูลผู้ขอลา -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>1. ข้อมูลผู้ขอลา</span>
+                    <span class="badge">เลือกดึงข้อมูลอัตโนมัติ</span>
+                </div>
+                <div class="form-group full">
+                    <label for="sickUserSelect">
+                        <span>เลือกจากทะเบียนกำลังพล</span>
+                        <small>ระบบจะดึงตำแหน่ง ที่อยู่ และสิทธิวันลาให้อัตโนมัติ</small>
+                    </label>
+                    <select id="sickUserSelect" onchange="loadSickPersonData(this.value)" oninput="loadSickPersonData(this.value)">
+                        <option value="">-- กรอกเอง / เลือกจากกำลังพล --</option>
+                    </select>
+                </div>
+                <div class="form-group full" style="margin-top: 0.75rem;">
+                    <label for="inpSickDocDate">วันที่เขียนใบลา</label>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <input type="date" id="inpSickDocDate" onchange="renderSickLeave()" style="max-width: 220px;">
+                        <label style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                            <input type="checkbox" id="chkSickDocDayBlank" checked onchange="renderSickLeave()">
+                            <span>เว้นช่องวันที่ไว้ (แสดงเฉพาะเดือน และ พ.ศ.)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top: 0.75rem;">
+                    <div class="form-group full">
+                        <label for="inpSickPlace">เขียนที่</label>
+                        <input type="text" id="inpSickPlace" value="ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickSubject">เรื่อง</label>
+                        <input type="text" id="inpSickSubject" value="ขอลาป่วย" oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickTo">เรียน</label>
+                        <input type="text" id="inpSickTo" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickPronoun">คำสรรพนาม</label>
+                        <select id="inpSickPronoun" onchange="renderSickLeave()">
+                            <option value="กระผม">กระผม</option>
+                            <option value="ดิฉัน">ดิฉัน</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickRank">ยศ (คำนำหน้า)</label>
+                        <input type="text" id="inpSickRank" value="ร.ท." oninput="renderSickLeave()" placeholder="เช่น ร.ท., พ.อ.อ.">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpSickName">ชื่อ - สกุล ผู้ขอลา</label>
+                        <input type="text" id="inpSickName" value="สมชาย  ใจดี" oninput="handleSickNameInput(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickPosition">ตำแหน่ง</label>
+                        <input type="text" id="inpSickPosition" value="ประจำ ผวสม.กกศ.ฯ" oninput="handleSickPosInput(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickPosition2">ตำแหน่ง (ต่อ / บรรทัดที่ 2 - ถ้ามี)</label>
+                        <input type="text" id="inpSickPosition2" value="" placeholder="เช่น ช่วยราชการ ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpSickPhone">เบอร์โทรศัพท์ติดต่อ</label>
+                        <input type="text" id="inpSickPhone" value="081-234-5678">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ข้อมูลการเจ็บป่วย & สถานที่พักรักษาตัว -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>2. การเจ็บป่วย & สถานที่รักษาตัว</span>
+                    <span class="badge">คำนวณวันทำการอัตโนมัติ</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label for="inpSickDiagnosis">ป่วยเป็น (อาการป่วย / โรคที่วินิจฉัย)</label>
+                        <input type="text" id="inpSickDiagnosis" value="ไข้หวัด" placeholder="เช่น ไข้หวัด, ปวดศีรษะมีไข้สูง, อาหารเป็นพิษ" oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickStartDate">ตั้งแต่วันที่</label>
+                        <input type="date" id="inpSickStartDate" onchange="handleSickDateChange('start')" oninput="handleSickDateChange('start')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickEndDate">จนถึงวันที่</label>
+                        <input type="date" id="inpSickEndDate" onchange="handleSickDateChange('end')" oninput="handleSickDateChange('end')">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpSickLeaveDays">
+                            <span>มีกำหนด (จำนวนวันทำการ)</span>
+                            <small>ไม่นับ ส.-อา. และวันหยุดราชการ</small>
+                        </label>
+                        <input type="number" id="inpSickLeaveDays" value="3" min="1" oninput="renderSickLeave()">
+                    </div>
+                </div>
+
+                <!-- ที่อยู่รักษาตัว -->
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                        <label style="font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0;">
+                            สถานที่พักรักษาตัวในระหว่างลาป่วย
+                        </label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="saveSickAddressToPersonnel()" style="font-size: 0.8rem; padding: 0.25rem 0.6rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="บันทึกที่อยู่นี้ลงในประวัติของกำลังพลที่เลือก">
+                            💾 บันทึกที่อยู่ลงข้อมูลกำลังพล
+                        </button>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="inpSickHomeNo">บ้านเลขที่</label>
+                            <input type="text" id="inpSickHomeNo" value="12/3" placeholder="เช่น 12/3 หรือ 45 ม.2" oninput="renderSickLeave()" onchange="saveSickAddressToPersonnel(true)">
+                        </div>
+                        <div class="form-group">
+                            <label for="inpSickRoad">ถนน</label>
+                            <input type="text" id="inpSickRoad" value="พหลโยธิน" placeholder="เช่น พหลโยธิน หรือ -" oninput="renderSickLeave()" onchange="saveSickAddressToPersonnel(true)">
+                        </div>
+                        <div class="form-group">
+                            <label for="inpSickSubdistrict">ตำบล / แขวง</label>
+                            <input type="text" id="inpSickSubdistrict" value="คลองถนน" placeholder="เช่น คลองถนน" oninput="renderSickLeave()" onchange="saveSickAddressToPersonnel(true)">
+                        </div>
+                        <div class="form-group">
+                            <label for="inpSickDistrict">อำเภอ / เขต</label>
+                            <input type="text" id="inpSickDistrict" value="สายไหม" placeholder="เช่น สายไหม" oninput="renderSickLeave()" onchange="saveSickAddressToPersonnel(true)">
+                        </div>
+                        <div class="form-group full">
+                            <label for="inpSickProvince">จังหวัด</label>
+                            <input type="text" id="inpSickProvince" value="กรุงเทพมหานคร" placeholder="เช่น กรุงเทพมหานคร" oninput="renderSickLeave()" onchange="saveSickAddressToPersonnel(true)">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 3. สถิติวันลาประจำปีงบประมาณ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>3. สถิติวันลาประจำปีงบประมาณ</span>
+                    <span class="badge">ลาป่วยตามระเบียบ ๖๐ วัน</span>
+                </div>
+                <div class="form-grid" style="display: none;">
+                    <div class="form-group full">
+                        <label for="inpSickAuthority">การลาป่วยครั้งนี้ อยู่ในอำนาจของ</label>
+                        <input type="text" id="inpSickAuthority" value="" oninput="renderSickLeave()" placeholder="เช่น ผบ.รร.จอ.ยศ.ทอ. หรือ หก.กกศ.รร.จอ.ยศ.ทอ.">
+                    </div>
+                    <div class="form-group full">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; font-size: 0.9rem; color: #4b5563;">
+                            <input type="checkbox" id="chkSickBlankStatDays" checked onchange="renderSickLeave()">
+                            <span>เว้นช่องสถิติวันลาไว้ (ไม่ต้องใส่ข้อมูลในแบบพิมพ์)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- สรุปสิทธิวันลาป่วย -->
+                <div class="quota-pill-group" style="margin-top: 0.65rem;">
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillSickTotalQuota">60 วัน</div>
+                        <div class="pill-lbl">สิทธิ์การลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillSickRemaining">57 วัน</div>
+                        <div class="pill-lbl">คงเหลือวันลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillSickPrevTaken">0 วัน</div>
+                        <div class="pill-lbl">ลาไปแล้ว</div>
+                    </div>
+                    <div class="quota-pill active">
+                        <div class="pill-val" id="pillSickThisLeave">3 วัน</div>
+                        <div class="pill-lbl">ลาครั้งนี้</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ข้อมูลสายการบังคับบัญชา & ผู้สั่งการ -->
+            <div class="form-section">
+                <div class="form-section-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span>4. สายการบังคับบัญชา & การอนุมัติ</span>
+                        <span id="badgeSickEndorseStatus" class="badge" style="display: none; background: #e0f2fe; color: #0369a1; font-weight: normal; font-size: 0.75rem;">ผู้ขอลาเป็น หน. เสนอตรงผู้มีอำนาจสั่งการ</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="syncSettingsToSection4('create-sick')" title="ดึงข้อมูลสายการบังคับบัญชาจากหน้าตั้งค่าระบบ" style="padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 500;">
+                        🔄 ดึงจากหน้าตั้งค่า
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group" id="fGroupSickEndorseTo">
+                        <label for="inpSickEndorseTo">เรียน (เสนอพิจารณา)</label>
+                        <input type="text" id="inpSickEndorseTo" value="หก.กกศ.รร.จอ.ยศ.ทอ." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group" id="fGroupSickEndorseRank">
+                        <label for="inpSickEndorseRank">ยศผู้บังคับบัญชาชั้นต้น</label>
+                        <input type="text" id="inpSickEndorseRank" value="น.ท." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupSickEndorsePos">
+                        <label for="inpSickEndorsePos">ตำแหน่งผู้บังคับบัญชาชั้นต้น (ตำแหน่ง 1)</label>
+                        <input type="text" id="inpSickEndorsePos" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupSickEndorsePos2">
+                        <label for="inpSickEndorsePos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpSickEndorsePos2" value="" placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupSickEndorseMonth">
+                        <label for="inpSickEndorseMonth">เดือนที่ลงนามเสนอ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpSickEndorseMonth">
+                            <input type="hidden" id="inpSickEndorseMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpSickEndorseMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpSickEndorseMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpSickEndorseMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickOrderRank">ยศผู้มีอำนาจสั่งการ</label>
+                        <input type="text" id="inpSickOrderRank" value="น.ท." oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpSickOrderPos1">ตำแหน่ง 1 (ทำการแทน)</label>
+                        <input type="text" id="inpSickOrderPos1" value="รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน" oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpSickOrderPos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpSickOrderPos2" value="หก.กกศ.รร.จอ.ยศ.ทอ." placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="renderSickLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupSickApprovalMonth">
+                        <label for="inpSickApprovalMonth">เดือนที่ลงนามอนุมัติ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpSickApprovalMonth">
+                            <input type="hidden" id="inpSickApprovalMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpSickApprovalMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpSickApprovalMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpSickApprovalMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ปุ่มดำเนินการหลัก -->
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+                <button class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;" onclick="window.print()">
+                    🖨️ พิมพ์ใบลาป่วย / บันทึก PDF
+                </button>
+                <button class="btn btn-success btn-block" onclick="saveSickLeaveApplication()">
+                    💾 บันทึกใบลาป่วยลงทะเบียนคุม
+                </button>
+            </div>
+        </div>
+
+        <!-- ฝั่งพรีวิวเอกสาร A4 (แบบ ๓ ตามรูปแบบ ทอ.) -->
+        <div class="preview-panel-wrap">
+            <div class="preview-toolbar non-printable">
+                <div class="toolbar-info">
+                    <strong>พรีวิวแบบ ๓ (ขนาดกระดาษ A4 ตามระเบียบ ทอ.)</strong>
+                    <span style="color: #94a3b8;">• 1 หน้ากระดาษมาตรฐาน</span>
+                </div>
+                <div class="toolbar-actions">
+                    <label style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" id="chkSickThaiNum" checked onchange="toggleSickNumeralFormat()">
+                        <span>แสดงเป็นเลขไทย (๑ ๒ ๓)</span>
+                    </label>
+                    <button class="btn btn-sm btn-primary" onclick="window.print()">
+                        🖨️ สั่งพิมพ์
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <div class="a4-page" id="paperSick">
+                    <!-- แบบ ๓ (ชิดขวาบน) -->
+                    <div class="form3-top-right">แบบ ๓</div>
+
+                    <!-- หัวข้อกึ่งกลาง ขีดเส้นใต้ -->
+                    <div class="form3-main-title">ใบลาป่วย</div>
+
+                    <!-- เขียนที่ และ วันที่ (เยื้องขวา) -->
+                    <div class="form3-meta-right">
+                        เขียนที่ <span class="dotted-line" id="pSickPlace" style="min-width: 170px;">ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span><br>
+                        วันที่ <span class="dotted-line" id="pSickDocD" style="min-width: 35px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span style="margin-left: 4px;">เดือน</span> <span class="dotted-line" id="pSickDocM" style="min-width: 45px; padding: 0 4px;">ก.ย.</span>
+                        <span style="margin-left: 6px;">พ.ศ.</span> <span class="dotted-line" id="pSickDocY" style="min-width: 30px; padding: 0 4px;">69</span>
+                    </div>
+
+                    <!-- เรื่อง และ เรียน -->
+                    <div class="form3-line-header">
+                        เรื่อง &nbsp; <span id="pSickSubject">ขอลาป่วย</span>
+                    </div>
+                    <div class="form3-line-header" style="margin-bottom: 6px;">
+                        เรียน &nbsp; <span id="pSickTo">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span>
+                    </div>
+
+                    <!-- เนื้อหาใบลาป่วย แบบ ๓ ตรงตามต้นฉบับ -->
+                    <div class="form3-body-container" id="pSickBodyContainer">
+                        <!-- บรรทัดที่ 1: ด้วยกระผม/ดิฉัน... ตำแหน่ง... -->
+                        <div class="form3-body-row indent" id="pSickApplicantRow1">
+                            <span>ด้วย<span id="pSickPronoun">กระผม</span></span>
+                            <span class="dotted-line fill-flex" id="pSickName">ร.ท.สมชาย&nbsp;&nbsp;ใจดี</span>
+                            <span>ตำแหน่ง</span>
+                            <span class="dotted-line fill-flex" id="pSickPos">ประจำ ผวสม.กกศ.ฯ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: ป่วยเป็น... จึงขอลาป่วยเพื่อรักษาตัว มีกำหนด...วัน ตั้งแต่วันที่... -->
+                        <div class="form3-body-row" id="pSickApplicantRow2">
+                            <span>ป่วยเป็น</span>
+                            <span class="dotted-line fill-flex" id="pSickDiagnosis" style="min-width: 140px;">ไข้หวัด</span>
+                            <span>จึงขอลาป่วยเพื่อรักษาตัว มีกำหนด</span>
+                            <span class="dotted-line fill-flex" id="pSickDays" style="max-width: 40px;">๓</span>
+                            <span>วัน ตั้งแต่วันที่</span>
+                            <span class="dotted-line fill-flex" id="pSickSD" style="max-width: 35px;">-</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: เดือน... พ.ศ.... จนถึงวันที่... เดือน... พ.ศ.... ในระหว่างลาป่วยนี้ได้รักษาตัวอยู่ที่ -->
+                        <div class="form3-body-row" id="pSickApplicantRow3">
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pSickSM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pSickSY" style="max-width: 40px; padding: 0 4px;">69</span>
+                            <span style="margin-left: 5px;">จนถึงวันที่</span>
+                            <span class="dotted-line fill-flex" id="pSickED" style="max-width: 35px;">-</span>
+                            <span style="margin-left: 3px; margin-right: 1px;">เดือน</span>
+                            <span class="dotted-line fill-flex" id="pSickEM" style="max-width: 55px; padding: 0 4px;">ก.ย.</span>
+                            <span style="margin-left: 6px; margin-right: 4px;">พ.ศ.</span>
+                            <span class="dotted-line fill-flex" id="pSickEY" style="max-width: 40px; padding: 0 4px;">69</span>
+                            <span style="margin-left: 5px;">ในระหว่างลาป่วยนี้ได้รักษาตัวอยู่ที่</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 4: บ้านเลขที่... ถนน... ตำบล/แขวง... อำเภอ/เขต... -->
+                        <div class="form3-body-row" id="pSickApplicantRow4">
+                            <span>บ้านเลขที่</span>
+                            <span class="dotted-line fill-flex" id="pSickHomeNo" style="min-width: 60px;">๑๒/๓</span>
+                            <span>ถนน</span>
+                            <span class="dotted-line fill-flex" id="pSickRoad" style="min-width: 90px;">พหลโยธิน</span>
+                            <span id="pSickSubdistrictLabel">แขวง</span>
+                            <span class="dotted-line fill-flex" id="pSickSubdistrict" style="min-width: 90px;">คลองถนน</span>
+                            <span id="pSickDistrictLabel">เขต</span>
+                            <span class="dotted-line fill-flex" id="pSickDistrict" style="min-width: 90px;">สายไหม</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 5: จังหวัด... -->
+                        <div class="form3-body-row" id="pSickApplicantRow5">
+                            <span>จังหวัด</span>
+                            <span class="dotted-line fill-flex" id="pSickProvince" style="max-width: 220px;">กรุงเทพมหานคร</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 6: กระผม/ดิฉัน ได้ลาป่วยอยู่เดิมแล้วในคราวเดียวกันนี้...ครั้ง รวม...วัน -->
+                        <div class="form3-body-row indent" id="pSickApplicantRow6">
+                            <span><span id="pSickPronounPrev">กระผม</span> ได้ลาป่วยอยู่เดิมแล้วในคราวเดียวกันนี้</span>
+                            <span class="dotted-line fill-flex" id="pSickPrevSameCount" style="max-width: 50px;">&nbsp;</span>
+                            <span>ครั้ง รวม</span>
+                            <span class="dotted-line fill-flex" id="pSickPrevSameDays" style="max-width: 50px;">&nbsp;</span>
+                            <span>วัน</span>
+                        </div>
+                    </div>
+
+                    <!-- ควรมิควรแล้วแต่จะกรุณา -->
+                    <div class="form3-closing">
+                        ควรมิควรแล้วแต่จะกรุณา
+                    </div>
+
+                    <!-- ลายมือชื่อผู้ขอลา -->
+                    <div class="form3-applicant-sign">
+                        (ลงชื่อ) &nbsp; <span id="pSickSignRank" style="font-weight: normal;">ร.ท.</span><span id="pSickSignRankSpacer">&nbsp;</span><span class="dotted-line" id="pSickSignLine" style="min-width: 180px;">&nbsp;</span>
+                    </div>
+
+                    <!-- เส้นแบ่งคั่นหน้า -->
+                    <hr class="form7-hr">
+
+                    <!-- ส่วนสถิติวันลา แบบ ๓ -->
+                    <div class="form3-stat-section">
+                        <!-- บรรทัดที่ 1: ในปีงบประมาณนี้... ได้ลาป่วย... ครั้ง -->
+                        <div class="form3-stat-row indent">
+                            <span>ในปีงบประมาณนี้</span>
+                            <span class="dotted-line" id="pSickStatPersonName" style="min-width: 140px;">ร.ท.สมชาย&nbsp;&nbsp;ใจดี</span>
+                            <span>ได้ลาป่วย</span>
+                            <span class="dotted-line fill-flex" id="pSickStatPrevCount" style="max-width: 60px;">&nbsp;</span>
+                            <span>ครั้ง</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: รวม... วัน ทั้งครั้งนี้รวมเป็น... วัน -->
+                        <div class="form3-stat-row">
+                            <span>รวม</span>
+                            <span class="dotted-line fill-flex" id="pSickStatPrevDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วัน ทั้งครั้งนี้รวมเป็น</span>
+                            <span class="dotted-line fill-flex" id="pSickStatTotalDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วัน</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: ในปีงบประมาณนี้ ผู้นี้เคยลากิจมาแล้ว... ครั้ง รวม... วันทำการ -->
+                        <div class="form3-stat-row indent" style="margin-top: 4px;">
+                            <span>ในปีงบประมาณนี้ ผู้นี้เคยลากิจมาแล้ว</span>
+                            <span class="dotted-line fill-flex" id="pSickStatEverCount" style="max-width: 60px;">&nbsp;</span>
+                            <span>ครั้ง รวม</span>
+                            <span class="dotted-line fill-flex" id="pSickStatEverDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 4: การลาป่วยครั้งนี้ อยู่ในอำนาจของ... อนุญาตได้ตามข้อบังคับฯ -->
+                        <div class="form3-stat-row">
+                            <span>การลาป่วยครั้งนี้ อยู่ในอำนาจของ</span>
+                            <span class="dotted-line fill-flex" id="pSickStatAuthority">&nbsp;</span>
+                            <span>อนุญาตได้ตามข้อบังคับฯ</span>
+                        </div>
+
+                        <!-- ลายมือชื่อผู้ตรวจสอบสถิติวันลา -->
+                        <div class="form3-stat-sign">
+                            <div class="form3-stat-sign-grid">
+                                <span>(ลงชื่อ)&nbsp;</span>
+                                <span class="dotted-line" style="min-width: 180px;">&nbsp;</span>
+
+                                <span>ตำแหน่ง&nbsp;</span>
+                                <span class="dotted-line" id="pSickStatSignPos" style="min-width: 180px;">&nbsp;</span>
+
+                                <span></span>
+                                <span class="date-center" id="pSickStatSignDate"><span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 35px;">&nbsp;</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนสายการบังคับบัญชา และ คำสั่งอนุมัติ (แบบ ๓) -->
+                    <div class="form3-approval-section" id="pSickApprovalSection">
+                        <!-- เสนอผู้บังคับบัญชาชั้นต้น -->
+                        <div class="form3-endorse-block" id="pSickEndorseBlock">
+                            <div class="form7-endorse-to">เรียน &nbsp; <span id="pSickEndorseTo">หก.กกศ.รร.จอ.ยศ.ทอ.</span></div>
+                            <div class="form7-endorse-sub"><span class="endorse-sub-spacer" id="pSickEndorseSubSpacer" aria-hidden="true">เรียน &nbsp; หก.ก</span>เพื่อพิจารณาอนุญาตต่อไป</div>
+                            <div class="form7-endorse-rank-row" id="pSickEndorseRankRow"><span class="endorse-sub-spacer" id="pSickEndorseRankSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจา</span><span id="pSickEndorseRank">น.ท.</span></div>
+                            <div class="form7-endorse-pos-row">
+                                <span class="endorse-sub-spacer" id="pSickEndorsePosSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจาน.ท.</span><div class="endorse-pos-block">
+                                    <div id="pSickEndorsePos1">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div id="pSickEndorsePos2" style="display: none;"></div>
+                                    <div class="endorse-date-center" id="pSickEndorseDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- คำสั่งผู้มีอำนาจสั่งการ -->
+                        <div class="form3-order-block" id="pSickOrderBlock">
+                            <div class="form7-order-text">- อนุญาต</div>
+                            <div class="form7-order-rank-row" id="pSickOrderRankRow"><span class="endorse-sub-spacer" id="pSickOrderRankSpacer" aria-hidden="true">- อนุญา</span><span id="pSickOrderRank">น.ท.</span></div>
+                            <div class="form7-order-pos-row">
+                                <span class="endorse-sub-spacer" id="pSickOrderPosSpacer" aria-hidden="true">- อนุญาน.ท.</span><div class="order-pos-block">
+                                    <div id="pSickOrderPos1">รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน</div>
+                                    <div id="pSickOrderPos2">หก.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div class="order-date-center" id="pSickOrderDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB: เขียนใบลา & พรีวิว A4 แบบ ๖ (PERSONAL LEAVE - CREATE & PREVIEW)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-create-personal">
+        <!-- ฝั่งกรอกข้อมูล (Form Controls) สำหรับใบลากิจ แบบ ๖ -->
+        <div class="form-panel">
+            <!-- 1. ข้อมูลผู้ขอลา -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>1. ข้อมูลผู้ขอลา</span>
+                    <span class="badge">เลือกดึงข้อมูลอัตโนมัติ</span>
+                </div>
+                <div class="form-group full">
+                    <label for="personalUserSelect">
+                        <span>เลือกจากทะเบียนกำลังพล</span>
+                        <small>ระบบจะดึงตำแหน่งและสิทธิวันลาให้อัตโนมัติ</small>
+                    </label>
+                    <select id="personalUserSelect" onchange="loadPersonalPersonData(this.value)" oninput="loadPersonalPersonData(this.value)">
+                        <option value="">-- กรอกเอง / เลือกจากกำลังพล --</option>
+                    </select>
+                </div>
+                <div class="form-group full" style="margin-top: 0.75rem;">
+                    <label for="inpPersonalDocDate">วันที่เขียนใบลา</label>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <input type="date" id="inpPersonalDocDate" onchange="renderPersonalLeave()" style="max-width: 220px;">
+                        <label style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                            <input type="checkbox" id="chkPersonalDocDayBlank" checked onchange="renderPersonalLeave()">
+                            <span>เว้นช่องวันที่ไว้ (แสดงเฉพาะเดือน และ พ.ศ.)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-grid" style="margin-top: 0.75rem;">
+                    <div class="form-group full">
+                        <label for="inpPersonalPlace">เขียนที่</label>
+                        <input type="text" id="inpPersonalPlace" value="ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalSubject">เรื่อง</label>
+                        <input type="text" id="inpPersonalSubject" value="ขอลากิจ" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalTo">เรียน</label>
+                        <input type="text" id="inpPersonalTo" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalPronoun">คำสรรพนาม</label>
+                        <select id="inpPersonalPronoun" onchange="renderPersonalLeave()">
+                            <option value="กระผม">กระผม</option>
+                            <option value="ดิฉัน">ดิฉัน</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalRank">ยศ (คำนำหน้า)</label>
+                        <input type="text" id="inpPersonalRank" placeholder="ร.ท." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpPersonalName">ชื่อ - สกุล ผู้ขอลา</label>
+                        <input type="text" id="inpPersonalName" placeholder="สมชาย ใจดี" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalPosition">ตำแหน่ง</label>
+                        <input type="text" id="inpPersonalPosition" placeholder="ประจำ ผวสม.กกศ.ฯ" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalPosition2">ตำแหน่ง (ต่อ / บรรทัดที่ 2 - ถ้ามี)</label>
+                        <input type="text" id="inpPersonalPosition2" placeholder="เช่น ช่วยราชการ ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpPersonalPhone">เบอร์โทรศัพท์ติดต่อ</label>
+                        <input type="text" id="inpPersonalPhone" placeholder="08x-xxx-xxxx" oninput="renderPersonalLeave()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. กำหนดวันลาและการเดินทาง -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>2. กำหนดวันลาและการเดินทาง</span>
+                    <span class="badge">คำนวณวันทำการอัตโนมัติ</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label for="inpPersonalReason">ขออนุญาตลาหยุดราชการเพื่อเดินทางไป (เหตุผล / กิจธุระ)</label>
+                        <input type="text" id="inpPersonalReason" value="จัดการธุระส่วนตัว" placeholder="เช่น จัดการเอกสารมรดก หรือ ติดต่อราชการ" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalStartDate">ตั้งแต่วันที่</label>
+                        <input type="date" id="inpPersonalStartDate" onchange="handlePersonalDateChange('start')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalEndDate">ถึงวันที่</label>
+                        <input type="date" id="inpPersonalEndDate" onchange="handlePersonalDateChange('end')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalLeaveDays">มีกำหนด (จำนวนวันทำการ)</label>
+                        <input type="number" id="inpPersonalLeaveDays" value="1" min="1" oninput="renderPersonalLeave()">
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">ไม่นับ ส.-อา. และวันหยุดราชการ</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalProvince">ในระหว่างลานี้ จะไปที่</label>
+                        <input type="text" id="inpPersonalProvince" value="กรุงเทพมหานคร" placeholder="เช่น เชียงใหม่ หรือ นนทบุรี" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalDepartDate">ในวันที่ (เดินทางไป)</label>
+                        <input type="date" id="inpPersonalDepartDate" onchange="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalReturnDate">และจะกลับในวันที่</label>
+                        <input type="date" id="inpPersonalReturnDate" onchange="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full" style="border-top: 1px dashed var(--border-light); padding-top: 0.75rem; margin-top: 0.25rem;">
+                        <label style="font-weight: 600; color: var(--text-muted); font-size: 0.85rem;">ลากิจอยู่เดิมแล้วในคราวเดียวกันนี้ (ถ้ามี)</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.25rem;">
+                            <div>
+                                <label for="inpPersonalPrevSameCount" style="font-size: 0.8rem;">ลาอยู่เดิมแล้ว (ครั้ง)</label>
+                                <input type="number" id="inpPersonalPrevSameCount" min="0" placeholder="เว้นว่างไว้เป็นเส้นประ" oninput="renderPersonalLeave()">
+                            </div>
+                            <div>
+                                <label for="inpPersonalPrevSameDays" style="font-size: 0.8rem;">รวม (วัน)</label>
+                                <input type="number" id="inpPersonalPrevSameDays" min="0" placeholder="เว้นว่างไว้เป็นเส้นประ" oninput="renderPersonalLeave()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. สถิติวันลาประจำปีงบประมาณ -->
+            <div class="form-section">
+                <div class="form-section-title">
+                    <span>3. สถิติวันลาประจำปีงบประมาณ</span>
+                    <span class="badge">ลากิจตามระเบียบ ๔๕ วัน</span>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; font-size: 0.9rem; color: #4b5563;">
+                            <input type="checkbox" id="chkPersonalBlankStatDays" checked onchange="renderPersonalLeave()">
+                            <span>เว้นช่องสถิติวันลาไว้ (ไม่ต้องใส่ข้อมูลในแบบพิมพ์)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- สรุปสิทธิวันลากิจ -->
+                <div class="quota-pill-group" style="margin-top: 0.65rem;">
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillPersonalTotalQuota">45 วัน</div>
+                        <div class="pill-lbl">สิทธิ์การลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillPersonalRemaining">44 วัน</div>
+                        <div class="pill-lbl">คงเหลือวันลา</div>
+                    </div>
+                    <div class="quota-pill">
+                        <div class="pill-val" id="pillPersonalPrevTaken">0 วัน</div>
+                        <div class="pill-lbl">ลาไปแล้ว</div>
+                    </div>
+                    <div class="quota-pill active">
+                        <div class="pill-val" id="pillPersonalThisLeave">1 วัน</div>
+                        <div class="pill-lbl">ลาครั้งนี้</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. สายการบังคับบัญชา & การอนุมัติ -->
+            <div class="form-section">
+                <div class="form-section-title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span>4. สายการบังคับบัญชา & การอนุมัติ</span>
+                        <span id="badgePersonalEndorseStatus" class="badge" style="display: none; background: #e0f2fe; color: #0369a1; font-weight: normal; font-size: 0.75rem;">ผู้ขอลาเป็น หน. เสนอตรงผู้มีอำนาจสั่งการ</span>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="syncSettingsToSection4('create-personal')" title="ดึงข้อมูลสายการบังคับบัญชาจากหน้าตั้งค่าระบบ" style="padding: 0.2rem 0.6rem; font-size: 0.75rem; font-weight: 500;">
+                        🔄 ดึงจากหน้าตั้งค่า
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group" id="fGroupPersonalEndorseTo">
+                        <label for="inpPersonalEndorseTo">เรียน (เสนอพิจารณา)</label>
+                        <input type="text" id="inpPersonalEndorseTo" value="หก.กกศ.รร.จอ.ยศ.ทอ." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group" id="fGroupPersonalEndorseRank">
+                        <label for="inpPersonalEndorseRank">ยศผู้บังคับบัญชาชั้นต้น</label>
+                        <input type="text" id="inpPersonalEndorseRank" value="น.ท." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupPersonalEndorsePos">
+                        <label for="inpPersonalEndorsePos">ตำแหน่งผู้บังคับบัญชาชั้นต้น (ตำแหน่ง 1)</label>
+                        <input type="text" id="inpPersonalEndorsePos" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupPersonalEndorsePos2">
+                        <label for="inpPersonalEndorsePos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpPersonalEndorsePos2" value="" placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupPersonalEndorseMonth">
+                        <label for="inpPersonalEndorseMonth">เดือนที่ลงนามเสนอ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpPersonalEndorseMonth">
+                            <input type="hidden" id="inpPersonalEndorseMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpPersonalEndorseMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpPersonalEndorseMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpPersonalEndorseMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalOrderRank">ยศผู้มีอำนาจสั่งการ</label>
+                        <input type="text" id="inpPersonalOrderRank" value="น.ท." oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group">
+                        <label for="inpPersonalOrderPos1">ตำแหน่ง 1 (ทำการแทน)</label>
+                        <input type="text" id="inpPersonalOrderPos1" value="รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full">
+                        <label for="inpPersonalOrderPos2">ตำแหน่ง 2 (ถ้ามี)</label>
+                        <input type="text" id="inpPersonalOrderPos2" value="หก.กกศ.รร.จอ.ยศ.ทอ." placeholder="เว้นว่างไว้หากมีบรรทัดเดียว" oninput="renderPersonalLeave()">
+                    </div>
+                    <div class="form-group full" id="fGroupPersonalApprovalMonth">
+                        <label for="inpPersonalApprovalMonth">เดือนที่ลงนามอนุมัติ (ปฏิทินเดือน)</label>
+                        <div class="thai-month-picker-wrapper" id="tmpWrap_inpPersonalApprovalMonth">
+                            <input type="hidden" id="inpPersonalApprovalMonth" value="2026-10">
+                            <div class="thai-month-input-box" onclick="openThaiMonthPicker('inpPersonalApprovalMonth', this)">
+                                <span class="thai-month-display-text" id="tmpDisp_inpPersonalApprovalMonth">ตุลาคม พ.ศ. ๒๕๖๙</span>
+                                <div class="thai-month-actions">
+                                    <button type="button" class="thai-month-clear-btn" onclick="event.stopPropagation(); clearThaiMonthPicker('inpPersonalApprovalMonth');" title="ล้างค่า">✕</button>
+                                    <span class="thai-month-calendar-icon">📅</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ปุ่มดำเนินการหลัก -->
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem;">
+                <button class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1rem;" onclick="window.print()">
+                    🖨️ พิมพ์ใบลากิจ / บันทึก PDF
+                </button>
+                <button class="btn btn-success btn-block" onclick="savePersonalLeaveApplication()">
+                    💾 บันทึกใบลากิจลงทะเบียนคุม
+                </button>
+            </div>
+        </div>
+
+        <!-- ฝั่งพรีวิวเอกสาร A4 (แบบ ๖ ตามรูปแบบ ทอ.) -->
+        <div class="preview-panel-wrap">
+            <div class="preview-toolbar non-printable">
+                <div class="toolbar-info">
+                    <strong>พรีวิวแบบ ๖ (ขนาดกระดาษ A4 ตามระเบียบ ทอ.)</strong>
+                    <span style="color: #94a3b8;">• 1 หน้ากระดาษมาตรฐาน</span>
+                </div>
+                <div class="toolbar-actions">
+                    <label style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" id="chkPersonalThaiNum" checked onchange="togglePersonalNumeralFormat()">
+                        <span>แสดงเป็นเลขไทย (๑ ๒ ๓)</span>
+                    </label>
+                    <button class="btn btn-sm btn-primary" onclick="window.print()">
+                        🖨️ สั่งพิมพ์
+                    </button>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <div class="a4-page" id="paperPersonal">
+                    <!-- แบบ ๖ (ชิดขวาบน) -->
+                    <div class="form6-top-right">แบบ ๖</div>
+                    
+                    <!-- หัวข้อกึ่งกลาง ขีดเส้นใต้ -->
+                    <div class="form6-main-title">ใบลากิจ</div>
+
+                    <!-- เขียนที่ และ วันที่ (เยื้องขวา) -->
+                    <div class="form6-meta-right">
+                        เขียนที่ <span class="dotted-line" id="pPersonalPlace" style="min-width: 170px;">ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span><br>
+                        วันที่ <span class="dotted-line" id="pPersonalDocD" style="min-width: 35px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span style="margin-left: 4px;">เดือน</span> <span class="dotted-line" id="pPersonalDocM" style="min-width: 55px; padding: 0 4px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span style="margin-left: 6px;">พ.ศ.</span> <span class="dotted-line" id="pPersonalDocY" style="min-width: 40px; padding: 0 4px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </div>
+
+                    <!-- เรื่อง และ เรียน (ชิดซ้าย) -->
+                    <div class="form6-line-header">
+                        เรื่อง &nbsp; <span id="pPersonalSubject">ขอลากิจ</span>
+                    </div>
+                    <div class="form6-line-header">
+                        เรียน &nbsp; <span id="pPersonalTo">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</span>
+                    </div>
+
+                    <!-- เนื้อความใบลา แบบ ๖ -->
+                    <div class="form6-body-container" id="pPersonalBodyContainer">
+                        <!-- เรนเดอร์ไดนามิกผ่านฟังก์ชัน renderPersonalLeave() -->
+                    </div>
+
+                    <!-- คำลงท้าย -->
+                    <div class="form6-closing">
+                        ควรมิควรแล้วแต่จะกรุณา
+                    </div>
+
+                    <!-- ลายมือชื่อผู้ขอลา -->
+                    <div class="form6-applicant-sign">
+                        (ลงชื่อ) <span id="pPersonalSignRank" style="display: none;"></span><span id="pPersonalSignRankSpacer" style="display: none;">&nbsp;</span><span class="dotted-line" id="pPersonalSignLine" style="min-width: 220px;">&nbsp;</span>
+                    </div>
+
+                    <!-- เส้นแบ่งคั่นหน้า -->
+                    <hr class="form7-hr">
+
+                    <!-- ส่วนสถิติวันลา แบบ ๖ -->
+                    <div class="form6-stat-section">
+                        <!-- บรรทัดที่ 1: ในปีงบประมาณนี้... ได้ลากิจมาแล้ว... ครั้ง -->
+                        <div class="form6-stat-row indent">
+                            <span>ในปีงบประมาณนี้</span>
+                            <span class="dotted-line" id="pPersonalStatPersonName" style="min-width: 140px;">ร.ท.สมชาย&nbsp;&nbsp;ใจดี</span>
+                            <span>ได้ลากิจมาแล้ว</span>
+                            <span class="dotted-line fill-flex" id="pPersonalStatPrevCount" style="max-width: 60px;">&nbsp;</span>
+                            <span>ครั้ง</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 2: รวม... วันทำการ ทั้งครั้งนี้รวมเป็น... วันทำการ -->
+                        <div class="form6-stat-row">
+                            <span>รวม</span>
+                            <span class="dotted-line fill-flex" id="pPersonalStatPrevDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ ทั้งครั้งนี้รวมเป็น</span>
+                            <span class="dotted-line fill-flex" id="pPersonalStatTotalDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วันทำการ</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 3: ในปีงบประมาณนี้ ผู้นี้เคยลาป่วยมาแล้ว... ครั้ง รวม... วัน -->
+                        <div class="form6-stat-row indent" style="margin-top: 4px;">
+                            <span>ในปีงบประมาณนี้ ผู้นี้เคยลาป่วยมาแล้ว</span>
+                            <span class="dotted-line fill-flex" id="pPersonalStatEverCount" style="max-width: 60px;">&nbsp;</span>
+                            <span>ครั้ง รวม</span>
+                            <span class="dotted-line fill-flex" id="pPersonalStatEverDays" style="max-width: 60px;">&nbsp;</span>
+                            <span>วัน</span>
+                        </div>
+
+                        <!-- บรรทัดที่ 4: การลากิจครั้งนี้อยู่ในอำนาจของ... อนุญาตได้ตามข้อบังคับ ฯ -->
+                        <div class="form6-stat-row indent" style="margin-top: 2px;">
+                            <span>การลากิจครั้งนี้อยู่ในอำนาจของ</span>
+                            <span class="dotted-line" id="pPersonalStatAuthority" style="min-width: 170px;">&nbsp;</span>
+                            <span>อนุญาตได้ตามข้อบังคับ ฯ</span>
+                        </div>
+
+                        <!-- ลายมือชื่อเจ้าหน้าที่ -->
+                        <div class="form6-stat-sign">
+                            <div class="form6-stat-sign-grid">
+                                <span>(ลงชื่อ)&nbsp;</span>
+                                <span class="dotted-line" style="min-width: 180px;">&nbsp;</span>
+
+                                <span>ตำแหน่ง&nbsp;</span>
+                                <span class="dotted-line" id="pPersonalStatSignPos" style="min-width: 180px;">&nbsp;</span>
+
+                                <span></span>
+                                <span class="date-center" id="pPersonalStatSignDate"><span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 45px;">&nbsp;</span> / <span class="dotted-line" style="min-width: 35px;">&nbsp;</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนสายการบังคับบัญชา และ คำสั่งอนุมัติ (แบบ ๖) -->
+                    <div class="form6-approval-section" id="pPersonalApprovalSection">
+                        <!-- เสนอผู้บังคับบัญชาชั้นต้น -->
+                        <div class="form6-endorse-block" id="pPersonalEndorseBlock">
+                            <div class="form7-endorse-to">เรียน &nbsp; <span id="pPersonalEndorseTo">หก.กกศ.รร.จอ.ยศ.ทอ.</span></div>
+                            <div class="form7-endorse-sub"><span class="endorse-sub-spacer" id="pPersonalEndorseSubSpacer" aria-hidden="true">เรียน &nbsp; หก.ก</span>เพื่อพิจารณาอนุญาต</div>
+                            <div class="form7-endorse-rank-row" id="pPersonalEndorseRankRow"><span class="endorse-sub-spacer" id="pPersonalEndorseRankSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจา</span><span id="pPersonalEndorseRank">น.ท.</span></div>
+                            <div class="form7-endorse-pos-row">
+                                <span class="endorse-sub-spacer" id="pPersonalEndorsePosSpacer" aria-hidden="true">เรียน &nbsp; หก.กเพื่อพิจาน.ท.</span><div class="endorse-pos-block">
+                                    <div id="pPersonalEndorsePos1">หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div id="pPersonalEndorsePos2" style="display: none;"></div>
+                                    <div class="endorse-date-center" id="pPersonalEndorseDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- คำสั่งผู้มีอำนาจสั่งการ -->
+                        <div class="form6-order-block" id="pPersonalOrderBlock">
+                            <div class="form7-order-text">- อนุญาต</div>
+                            <div class="form7-order-rank-row" id="pPersonalOrderRankRow"><span class="endorse-sub-spacer" id="pPersonalOrderRankSpacer" aria-hidden="true">- อนุญา</span><span id="pPersonalOrderRank">น.ท.</span></div>
+                            <div class="form7-order-pos-row">
+                                <span class="endorse-sub-spacer" id="pPersonalOrderPosSpacer" aria-hidden="true">- อนุญาน.ท.</span><div class="order-pos-block">
+                                    <div id="pPersonalOrderPos1">รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน</div>
+                                    <div id="pPersonalOrderPos2">หก.กกศ.รร.จอ.ยศ.ทอ.</div>
+                                    <div class="order-date-center" id="pPersonalOrderDate">ต.ค.๖๙</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 2: ทะเบียนใบลาพักผ่อน (LEAVE REGISTER / HISTORY)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-history" style="padding: 1.5rem 2rem;">
+        <div style="max-width: 1650px; margin: 0 auto; width: 100%;">
+            <!-- Summary Stats -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-bottom: 1.5rem; gap: 1.25rem;">
+                <div class="stat-card card-blue">
+                    <div class="stat-card-icon blue">📋</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">ใบลาทั้งหมด</div>
+                        <div class="stat-card-val" id="histTotalLeaves">0</div>
+                        <div class="stat-card-sub">ในระบบทะเบียนคุม</div>
+                    </div>
+                </div>
+                <div class="stat-card card-green">
+                    <div class="stat-card-icon green">✅</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">อนุมัติแล้ว</div>
+                        <div class="stat-card-val" id="histApprovedLeaves">0</div>
+                        <div class="stat-card-sub">ผ่านการอนุมัติเรียบร้อย</div>
+                    </div>
+                </div>
+                <div class="stat-card card-amber">
+                    <div class="stat-card-icon amber">⏳</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">รอพิจารณา / ไม่อนุมัติ</div>
+                        <div class="stat-card-val" id="histPendingLeaves">0</div>
+                        <div class="stat-card-sub">รอสั่งการ / ไม่อนุมัติ</div>
+                    </div>
+                </div>
+                <div class="stat-card card-purple">
+                    <div class="stat-card-icon purple">🌴</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">วันลาพักผ่อนที่อนุมัติ</div>
+                        <div class="stat-card-val" id="histTotalDays">0 วัน</div>
+                        <div class="stat-card-sub">รวมวันทำการที่ได้รับอนุมัติ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Table -->
+            <div class="card" style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); border-radius: 14px;">
+                <div class="card-header" style="flex-wrap: wrap; gap: 1rem; padding: 1.15rem 1.5rem; background: #ffffff; border-bottom: 1px solid #f1f5f9;">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 0.65rem;">
+                        <span style="font-size: 1.25rem;">📋</span>
+                        <span style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">ทะเบียนคุมใบลา (ทุกประเภท)</span>
+                        <span class="badge" id="historyTableCountBadge" style="background: #eff6ff; color: #2563eb; font-weight: 600; border: 1px solid #dbeafe;">0 รายการ</span>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <button class="btn btn-secondary btn-sm" onclick="exportLeavesToCSV()" style="border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; padding: 0.5rem 0.9rem;">
+                            <span>📥 ส่งออก CSV (Excel)</span>
+                        </button>
+                        <button class="btn btn-primary btn-sm btn-add-user" onclick="switchTab('create')" style="border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                            <span>➕ เขียนใบลาใหม่</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Controls Toolbar -->
+                <div style="padding: 1rem 1.5rem 0.85rem 1.5rem; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 0.85rem;">
+                    <!-- Leave Type Filter Pills -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                        <div class="history-type-pills" style="margin-bottom: 0;">
+                            <button type="button" class="type-filter-btn active" id="btnFilterTypeAll" onclick="setLeaveTypeFilter('all')">
+                                <span>📋 ทั้งหมด</span>
+                                <span class="type-filter-badge" id="countTypeAll">0</span>
+                            </button>
+                            <button type="button" class="type-filter-btn" id="btnFilterTypeVacation" onclick="setLeaveTypeFilter('vacation')">
+                                <span>🌴 ลาพักผ่อน (แบบ ๗)</span>
+                                <span class="type-filter-badge" id="countTypeVacation">0</span>
+                            </button>
+                            <button type="button" class="type-filter-btn" id="btnFilterTypeSick" onclick="setLeaveTypeFilter('sick')">
+                                <span>🩺 ลาป่วย (แบบ ๓)</span>
+                                <span class="type-filter-badge" id="countTypeSick">0</span>
+                            </button>
+                            <button type="button" class="type-filter-btn" id="btnFilterTypePersonal" onclick="setLeaveTypeFilter('personal')">
+                                <span>💼 ลากิจ (แบบ ๖)</span>
+                                <span class="type-filter-badge" id="countTypePersonal">0</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Box & Select Dropdowns -->
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <div class="search-box-container" style="flex: 1; min-width: 260px; max-width: 400px;">
+                            <span class="search-box-icon">🔍</span>
+                            <input type="text" id="searchLeave" placeholder="ค้นหาชื่อ, ตำแหน่ง, เลขที่ใบลา, จังหวัด..." oninput="renderHistoryTable()" style="width: 100%;">
+                        </div>
+                        <select id="filterLeaveType" onchange="syncTypeFilterSelect(this.value)" class="filter-select">
+                            <option value="all">ทุกประเภทการลา</option>
+                            <option value="vacation">🌴 ลาพักผ่อน (แบบ ๗)</option>
+                            <option value="sick">🩺 ลาป่วย (แบบ ๓)</option>
+                            <option value="personal">💼 ลากิจ (แบบ ๖)</option>
+                        </select>
+                        <select id="filterLeaveStatus" onchange="renderHistoryTable()" class="filter-select">
+                            <option value="all">ทุกสถานะการอนุมัติ</option>
+                            <option value="approved">✅ อนุมัติแล้ว</option>
+                            <option value="pending">⏳ รอพิจารณาอนุมัติ</option>
+                            <option value="rejected">❌ ไม่อนุมัติ</option>
+                            <option value="cancelled">ยกเลิก</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card-body" style="padding: 0;">
+                    <!-- Table -->
+                    <div class="data-table-wrapper" style="border-radius: 0 0 14px 14px; border: none; overflow-x: auto;">
+                        <table class="data-table" id="historyTable" style="width: 100%; table-layout: auto;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center; width: 115px;">เลขที่ใบลา</th>
+                                    <th style="text-align:center; width: 135px;">ประเภทใบลา</th>
+                                    <th style="min-width: 160px;">ยศ - ชื่อ - สกุล</th>
+                                    <th style="min-width: 155px;">ตำแหน่ง / สังกัด</th>
+                                    <th style="min-width: 175px;">ช่วงวันลา</th>
+                                    <th style="text-align:center; width: 85px;">จำนวน</th>
+                                    <th style="min-width: 155px;">ไปที่จังหวัด / อาการ</th>
+                                    <th style="text-align:center; width: 115px;">สถานะ</th>
+                                    <th style="text-align:center; width: 195px;">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 3: ทะเบียนกำลังพล (PERSONNEL MANAGEMENT)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-personnel">
+        <div style="width: 100%;">
+            <!-- Summary Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-icon blue">👥</div>
+                    <div class="stat-card-info">
+                        <h3 id="statTotalPersonnel">0</h3>
+                        <p>กำลังพลทั้งหมดในระบบ</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon green">📊</div>
+                    <div class="stat-card-info">
+                        <h3 id="statTotalQuota">0 วัน</h3>
+                        <p>รวมสิทธิวันลาทั้งหมด</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon amber">🏖️</div>
+                    <div class="stat-card-info">
+                        <h3 id="statTotalLeaveUsed">0 วัน</h3>
+                        <p>ใช้วันลาไปแล้ว</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon purple">✨</div>
+                    <div class="stat-card-info">
+                        <h3 id="statAvgRemaining">0 วัน</h3>
+                        <p>วันลาเฉลี่ยคงเหลือ/คน</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Table -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>รายชื่อกำลังพลและสิทธิการลาพักผ่อน</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="openAddPersonModal()">
+                        + เพิ่มกำลังพลใหม่
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Search Bar -->
+                    <div class="table-filter-bar">
+                        <div class="filter-left">
+                            <input type="text" id="searchPersonnel" class="search-input" placeholder="🔍 ค้นหายศ, ชื่อ, ตำแหน่ง..." oninput="renderPersonnelTable()">
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center; width: 60px;">ลำดับ</th>
+                                    <th>ยศ - ชื่อ - สกุล</th>
+                                    <th>ตำแหน่ง</th>
+                                    <th style="text-align:center;">สิทธิปีนี้</th>
+                                    <th style="text-align:center;">สะสม</th>
+                                    <th style="text-align:center;">รวมสิทธิ</th>
+                                    <th style="text-align:center;">ใช้ไปแล้ว</th>
+                                    <th style="text-align:center;">คงเหลือ</th>
+                                    <th style="text-align:center; width: 220px;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="personnelTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 4: ตั้งค่าระบบ & สำรองข้อมูล (SETTINGS)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-settings">
+        <div style="max-width: 900px; margin: 0 auto; width: 100%;">
+            <!-- ตั้งค่าชื่อระบบและตราสัญลักษณ์ (Header & Logo) -->
+            <div class="card" style="margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); border-radius: 14px;">
+                <div class="card-header" style="background: #ffffff; border-bottom: 1px solid #f1f5f9; padding: 1.15rem 1.5rem;">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 0.65rem;">
+                        <span style="font-size: 1.25rem;">🏛️</span>
+                        <span style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">ตั้งค่าชื่อระบบและตราสัญลักษณ์ (Header & Logo)</span>
+                    </div>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <!-- Live Header Preview -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem; display: block;">
+                            👁️ ตัวอย่างการแสดงผลบนแถบด้านบน (Live Header Preview)
+                        </label>
+                        <div id="headerPreviewBanner" style="background: linear-gradient(135deg, #0b192c 0%, #1e3e62 100%); padding: 0.85rem 1.25rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);">
+                            <div id="previewLogoContainer" style="width: 40px; height: 40px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid rgba(255, 255, 255, 0.28); flex-shrink: 0; overflow: hidden;">
+                                <span id="previewLogoText">📋</span>
+                            </div>
+                            <div style="min-width: 0; flex: 1;">
+                                <div id="previewAppTitle" style="font-size: 1.025rem; font-weight: 700; color: #ffffff; line-height: 1.25;">
+                                    ระบบเขียนใบลาอิเล็กทรอนิกส์ (แบบ ๗, แบบ ๓ และ แบบ ๖)
+                                </div>
+                                <div id="previewAppSubtitle" style="font-size: 0.775rem; color: rgba(255, 255, 255, 0.78); font-weight: 400; margin-top: 2px;">
+                                    งานสารบรรณและทะเบียนกำลังพล • ผวสม.กกศ.รร.จอ.ยศ.ทอ.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- System Title -->
+                        <div class="form-group full">
+                            <label for="setSystemTitle" style="font-weight: 600;">
+                                ชื่อระบบหลัก (หัวข้อบรรทัดบน)
+                            </label>
+                            <input type="text" id="setSystemTitle" class="form-control" placeholder="เช่น ระบบเขียนใบลาอิเล็กทรอนิกส์ (แบบ ๗, แบบ ๓ และ แบบ ๖)" oninput="updateHeaderPreview()">
+                        </div>
+
+                        <!-- System Subtitle -->
+                        <div class="form-group full">
+                            <label for="setSystemSubtitle" style="font-weight: 600;">
+                                ข้อความบรรทัดย่อย (สังกัด / หน่วยงาน)
+                            </label>
+                            <input type="text" id="setSystemSubtitle" class="form-control" placeholder="เช่น งานสารบรรณและทะเบียนกำลังพล • ผวสม.กกศ.รร.จอ.ยศ.ทอ." oninput="updateHeaderPreview()">
+                        </div>
+
+                        <!-- Logo Settings -->
+                        <div class="form-group full">
+                            <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                                ตราสัญลักษณ์ / โลโก้ (Logo)
+                            </label>
+                            
+                            <!-- Logo selection area -->
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.15rem; display: flex; flex-direction: column; gap: 1rem;">
+                                <!-- Upload Image Option -->
+                                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                    <div id="currentLogoThumb" style="width: 54px; height: 54px; border-radius: 12px; background: #ffffff; border: 1.5px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 1.85rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex-shrink: 0;">
+                                        <span id="thumbIcon">📋</span>
+                                    </div>
+                                    <div style="flex: 1; min-width: 220px;">
+                                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                            <label class="btn btn-secondary btn-sm" style="margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+                                                <span>📁 อัปโหลดไฟล์รูปภาพ Logo...</span>
+                                                <input type="file" id="inputLogoFile" accept="image/*" style="display: none;" onchange="handleLogoFileUpload(event)">
+                                            </label>
+                                            <button type="button" class="btn btn-sm" onclick="resetLogoToDefault()" style="background: #ffffff; border: 1px solid #cbd5e1; color: #475569; font-weight: 500; border-radius: 8px;">
+                                                🔄 คืนค่าโลโก้เริ่มต้น
+                                            </button>
+                                        </div>
+                                        <div style="font-size: 0.775rem; color: #64748b; margin-top: 5px;">
+                                            รองรับไฟล์รูปภาพ PNG, JPG, WebP, SVG (แนะนำภาพพื้นหลังโปร่งใส หรือสี่เหลี่ยมจัตุรัส)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Icon / Emoji Picker -->
+                                <div>
+                                    <div style="font-size: 0.8rem; font-weight: 600; color: #475569; margin-bottom: 0.4rem;">
+                                        หรือเลือกไอคอนสำเร็จรูปด่วน:
+                                    </div>
+                                    <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;" id="quickLogoIcons">
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('📋')">📋</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('✈️')">✈️</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🎖️')">🎖️</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🏛️')">🏛️</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🛡️')">🛡️</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('⭐')">⭐</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🇹🇭')">🇹🇭</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('📄')">📄</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🌴')">🌴</button>
+                                        <button type="button" class="quick-icon-btn" onclick="selectQuickLogo('🦅')">🦅</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Hidden field to hold current logo value (data url or emoji) -->
+                            <input type="hidden" id="setSystemLogo" value="📋">
+                        </div>
+                    </div>
+
+                    <!-- Action buttons for Header & Logo card -->
+                    <div style="margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="resetHeaderDefaults()" style="border-radius: 8px;">
+                            🔄 คืนค่าชื่อระบบและ Logo ทั้งหมด
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveHeaderSettings()">
+                            💾 บันทึกชื่อระบบและ Logo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>⚙️ ตั้งค่าค่าเริ่มต้นหน่วยงานและสายการบังคับบัญชา</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label for="setWrittenAt">สถานที่เขียนที่ (หน่วยงาน)</label>
+                            <input type="text" id="setWrittenAt" value="ผวสม.กกศ.รร.จอ.ยศ.ทอ.">
+                        </div>
+                        <div class="form-group full">
+                            <label for="setDefaultTo">เรียน (หัวหน้าหน่วยงาน)</label>
+                            <input type="text" id="setDefaultTo" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.">
+                        </div>
+                        <div class="form-group full">
+                            <label for="setStatSignPos">ตำแหน่งผู้ตรวจสอบสถิติวันลา (เว้นว่างได้)</label>
+                            <input type="text" id="setStatSignPos" value="" placeholder="เว้นว่างไว้เป็นเส้นประ">
+                        </div>
+                        <div class="form-group">
+                            <label for="setEndorseTo">เรียน (ผู้บังคับบัญชาพิจารณา)</label>
+                            <input type="text" id="setEndorseTo" value="หก.กกศ.รร.จอ.ยศ.ทอ.">
+                        </div>
+                        <div class="form-group">
+                            <label for="setEndorseRank">ยศผู้บังคับบัญชาชั้นต้น</label>
+                            <input type="text" id="setEndorseRank" value="น.ท.">
+                        </div>
+                        <div class="form-group full">
+                            <label for="setEndorsePos">ตำแหน่งผู้บังคับบัญชาชั้นต้น (ตำแหน่ง 1)</label>
+                            <input type="text" id="setEndorsePos" value="หน.ผวสม.กกศ.รร.จอ.ยศ.ทอ.">
+                        </div>
+                        <div class="form-group full">
+                            <label for="setEndorsePos2">ตำแหน่งผู้บังคับบัญชาชั้นต้น (ตำแหน่ง 2 ถ้ามี)</label>
+                            <input type="text" id="setEndorsePos2" value="" placeholder="เว้นว่างไว้หากมีบรรทัดเดียว">
+                        </div>
+                        <div class="form-group">
+                            <label for="setOrderRank">ยศผู้มีอำนาจสั่งการ</label>
+                            <input type="text" id="setOrderRank" value="น.ท.">
+                        </div>
+                        <div class="form-group">
+                            <label for="setOrderPos1">ตำแหน่ง 1 (ทำการแทน)</label>
+                            <input type="text" id="setOrderPos1" value="รอง หก.กกศ.รร.จอ.ยศ.ทอ.ทำการแทน">
+                        </div>
+                        <div class="form-group full">
+                            <label for="setOrderPos2">ตำแหน่ง 2</label>
+                            <input type="text" id="setOrderPos2" value="หก.กกศ.รร.จอ.ยศ.ทอ.">
+                        </div>
+                        <div class="form-group full" style="margin-top: 0.5rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="setUseThaiNum" checked>
+                                <span>กำหนดให้ใช้ตัวเลขไทย (๑ ๒ ๓) บนแบบพิมพ์โดยค่าเริ่มต้น</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                        <button class="btn btn-primary" onclick="saveSettingsFromForm()">
+                            💾 บันทึกการตั้งค่า
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- สำรองและกู้คืนข้อมูล -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>💾 สำรองและกู้คืนข้อมูล (Backup & Restore)</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        ข้อมูลทั้งหมดจะถูกบันทึกไว้ในเบราว์เซอร์ของเครื่องนี้ (LocalStorage) คุณสามารถดาวน์โหลดไฟล์สำรองข้อมูล JSON ไว้เพื่อความปลอดภัย หรือนำไปเปิดใช้งานบนเครื่องอื่นได้
+                    </p>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="exportBackupJSON()">
+                            📤 ส่งออกไฟล์สำรองข้อมูล (Backup JSON)
+                        </button>
+                        <label class="btn btn-secondary" style="margin: 0; cursor: pointer;">
+                            📥 กู้คืนข้อมูลจากไฟล์ (Restore JSON)
+                            <input type="file" accept=".json" style="display: none;" onchange="importBackupJSON(event)">
+                        </label>
+                        <button class="btn btn-danger" onclick="resetToDefaultData()" style="margin-left: auto;">
+                            🔄 คืนค่าข้อมูลตัวอย่างเริ่มต้น
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- เชื่อมต่อฐานข้อมูลคลาวด์ Supabase -->
+            <div class="card" id="supabaseSettingsCard">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-title">
+                        <span>⚡ เชื่อมต่อฐานข้อมูลคลาวด์ (Supabase Cloud Database)</span>
+                    </div>
+                    <span id="supabaseStatusBadge" class="status-pill status-pending" style="font-size: 0.78rem;">
+                        <span class="status-dot" style="background: #94a3b8;"></span>ยังไม่เชื่อมต่อ (ใช้งาน LocalStorage)
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">
+                        เชื่อมต่อกับ Supabase เพื่อให้ข้อมูลใบลา ทะเบียนกำลังพล และบัญชีผู้ใช้ ซิงค์แบบออนไลน์ข้ามเครื่องได้ตลอดเวลา หากยังไม่ได้เชื่อมต่อระบบจะทำงานในโหมดออฟไลน์บันทึกลงเครื่องอัตโนมัติ
+                    </p>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label for="sbProjectUrl">Supabase Project URL</label>
+                            <input type="text" id="sbProjectUrl" placeholder="https://your-project-id.supabase.co" autocomplete="off">
+                        </div>
+                        <div class="form-group full">
+                            <label for="sbAnonKey">Supabase Anon Public Key</label>
+                            <input type="password" id="sbAnonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+                        <button type="button" class="btn btn-primary" onclick="handleSaveSupabaseConfig()">
+                            💾 บันทึกและเชื่อมต่อ Supabase
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="handleTestSupabase()">
+                            🔌 ทดสอบการเชื่อมต่อ
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="handlePushToSupabase()" title="ส่งข้อมูลจากเครื่องขึ้น Supabase">
+                            ☁️ อัปโหลดข้อมูลขึ้น Supabase
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="handlePullFromSupabase()" title="ดึงข้อมูลจาก Supabase ลงเครื่อง">
+                            📥 ซิงค์ข้อมูลลงเครื่อง
+                        </button>
+                    </div>
+                    
+                    <div id="sbStatusMsg" style="margin-top: 0.75rem; font-size: 0.85rem; display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 5: สิทธิ์การใช้งาน & จัดการผู้ใช้ (PERMISSIONS & USER MANAGEMENT)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-permissions" style="padding: 1.5rem 2rem;">
+        <div style="max-width: 1650px; margin: 0 auto; width: 100%;">
+            <!-- KPI Cards -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-bottom: 1.5rem; gap: 1.25rem;">
+                <div class="stat-card card-blue">
+                    <div class="stat-card-icon blue">👥</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">ผู้ใช้งานทั้งหมด</div>
+                        <div class="stat-card-val" id="totalUsersCount">0</div>
+                        <div class="stat-card-sub">บัญชีในระบบ</div>
+                    </div>
+                </div>
+                <div class="stat-card card-purple">
+                    <div class="stat-card-icon purple">🛡️</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">ผู้ดูแลระบบ (Admin)</div>
+                        <div class="stat-card-val" id="adminUsersCount">0</div>
+                        <div class="stat-card-sub">สิทธิ์เข้าถึงทุกหน้า</div>
+                    </div>
+                </div>
+                <div class="stat-card card-green">
+                    <div class="stat-card-icon green">👤</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">ผู้ใช้งานทั่วไป (User)</div>
+                        <div class="stat-card-val" id="generalUsersCount">0</div>
+                        <div class="stat-card-sub">กำหนดสิทธิ์เฉพาะหน้า</div>
+                    </div>
+                </div>
+                <div class="stat-card card-amber">
+                    <div class="stat-card-icon amber">🔑</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">ผู้ใช้ปัจจุบัน</div>
+                        <div class="stat-card-val user-name-val" id="activeUserLabel">admin</div>
+                        <div class="stat-card-sub" id="activeUserRoleLabel">ผู้ดูแลระบบ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Table Card -->
+            <div class="card" style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); border-radius: 14px;">
+                <div class="card-header" style="flex-wrap: wrap; gap: 1rem; padding: 1.15rem 1.5rem; background: #ffffff; border-bottom: 1px solid #f1f5f9;">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 0.65rem;">
+                        <span style="font-size: 1.25rem;">🔐</span>
+                        <span style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">จัดการผู้ใช้งานและกำหนดสิทธิ์</span>
+                        <span class="badge" id="userTableCountBadge" style="background: #eff6ff; color: #2563eb; font-weight: 600; border: 1px solid #dbeafe;">0 บัญชี</span>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <div class="search-box-container">
+                            <span class="search-box-icon">🔍</span>
+                            <input type="text" id="searchUserInput" placeholder="ค้นหาชื่อผู้ใช้, ชื่อ-สกุล..." oninput="renderUsersTable()">
+                        </div>
+                        <select id="filterUserRole" onchange="renderUsersTable()" class="filter-select">
+                            <option value="all">ทุกบทบาท (All Roles)</option>
+                            <option value="superadmin">⚡ ผู้ดูแลระบบระดับสูง (Superadmin)</option>
+                            <option value="admin">🛡️ ผู้ดูแลระบบ (Admin)</option>
+                            <option value="user">👤 ผู้ใช้งานทั่วไป (User)</option>
+                            <option value="locked">🔒 บัญชีที่ถูกล็อค (Locked)</option>
+                        </select>
+                        <button class="btn btn-primary btn-add-user" onclick="openUserModal()">
+                            <span>➕ เพิ่มผู้ใช้งานใหม่</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="data-table-wrapper" style="border-radius: 0 0 14px 14px; border: none; overflow-x: auto;">
+                        <table class="data-table" id="usersTable" style="width: 100%; table-layout: auto;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 55px; text-align: center;">#</th>
+                                    <th style="width: 175px;">ชื่อผู้ใช้งาน (Username)</th>
+                                    <th style="width: 250px;">ชื่อ - นามสกุล / สังกัด</th>
+                                    <th style="width: 140px; text-align: center;">บทบาท</th>
+                                    <th style="min-width: 320px;">หน้าที่ได้รับสิทธิ์เข้าถึง (Allowed Pages)</th>
+                                    <th style="width: 140px; text-align: center;">รหัสผ่าน</th>
+                                    <th style="width: 150px; text-align: center;">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Dynamically Rendered -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         TAB 6: บันทึกประวัติการใช้งานระบบ (AUDIT LOG)
+         ========================================================================== -->
+    <div class="main-container tab-content" id="tab-audit-log" style="padding: 1.5rem 2rem;">
+        <div style="max-width: 1650px; margin: 0 auto; width: 100%;">
+            <!-- KPI Cards -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-bottom: 1.5rem; gap: 1.25rem;">
+                <div class="stat-card card-blue">
+                    <div class="stat-card-icon blue">📜</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">กิจกรรมทั้งหมด</div>
+                        <div class="stat-card-val" id="auditTotalLogsCount">0</div>
+                        <div class="stat-card-sub">บันทึกในระบบ</div>
+                    </div>
+                </div>
+                <div class="stat-card card-green">
+                    <div class="stat-card-icon green">🔑</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">เข้าสู่ระบบ / ความปลอดภัย</div>
+                        <div class="stat-card-val" id="auditAuthLogsCount">0</div>
+                        <div class="stat-card-sub">Login, Logout, รหัสผ่าน</div>
+                    </div>
+                </div>
+                <div class="stat-card card-purple">
+                    <div class="stat-card-icon purple">📝</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">กิจกรรมใบลา</div>
+                        <div class="stat-card-val" id="auditLeaveLogsCount">0</div>
+                        <div class="stat-card-sub">สร้าง, อนุมัติ, ลบใบลา</div>
+                    </div>
+                </div>
+                <div class="stat-card card-amber">
+                    <div class="stat-card-icon amber">🛡️</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">สิทธิ์ & การตั้งค่าระบบ</div>
+                        <div class="stat-card-val" id="auditAdminLogsCount">0</div>
+                        <div class="stat-card-sub">ผู้ใช้, กำลังพล, ตั้งค่า</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Table Card -->
+            <div class="card" style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-color); border-radius: 14px;">
+                <div class="card-header" style="flex-wrap: wrap; gap: 1rem; padding: 1.15rem 1.5rem; background: #ffffff; border-bottom: 1px solid #f1f5f9;">
+                    <div class="card-title" style="display: flex; align-items: center; gap: 0.65rem;">
+                        <span style="font-size: 1.25rem;">📜</span>
+                        <span style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">บันทึกประวัติการใช้งานระบบ (System Audit Log)</span>
+                        <span class="badge" id="auditLogCountBadge" style="background: #eff6ff; color: #2563eb; font-weight: 600; border: 1px solid #dbeafe;">0 รายการ</span>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <div class="search-box-container">
+                            <span class="search-box-icon">🔍</span>
+                            <input type="text" id="searchAuditLogInput" placeholder="ค้นหากิจกรรม, ผู้ใช้, รายละเอียด..." oninput="onAuditLogSearch(this.value)">
+                        </div>
+                        <select id="filterAuditCategory" onchange="setAuditLogCategory(this.value)" class="filter-select">
+                            <option value="all">ทุกหมวดหมู่ (All Categories)</option>
+                            <option value="auth">🔑 การเข้าสู่ระบบ & ความปลอดภัย</option>
+                            <option value="leave">📝 กิจกรรมใบลา</option>
+                            <option value="personnel">👥 การจัดการกำลังพล</option>
+                            <option value="permissions">🔐 สิทธิ์ผู้ใช้งาน & บัญชี</option>
+                            <option value="settings">⚙️ การตั้งค่าระบบ & ข้อมูลสำรอง</option>
+                        </select>
+                        <select id="filterAuditUser" onchange="setAuditLogUser(this.value)" class="filter-select">
+                            <option value="all">ทุกผู้ใช้งาน (All Users)</option>
+                        </select>
+                        <select id="filterAuditDate" onchange="setAuditLogDate(this.value)" class="filter-select">
+                            <option value="all">ทุกช่วงเวลา (All Time)</option>
+                            <option value="today">วันนี้ (Today)</option>
+                            <option value="7days">๗ วันล่าสุด</option>
+                            <option value="30days">๓๐ วันล่าสุด</option>
+                        </select>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="renderAuditLogTable()" title="รีเฟรชข้อมูล">
+                            🔄 รีเฟรช
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="exportAuditLogCSV()" title="ส่งออกเป็นไฟล์ CSV">
+                            📥 ส่งออก CSV
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="clearAuditLogs()" title="ล้างประวัติกิจกรรม (เฉพาะ Admin)">
+                            🗑️ ล้างประวัติ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table audit-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 55px; text-align: center;">ลำดับ</th>
+                                <th style="width: 175px;">วัน-เวลา</th>
+                                <th style="width: 170px;">ผู้ใช้งาน</th>
+                                <th style="width: 140px; text-align: center;">หมวดหมู่</th>
+                                <th style="width: 170px;">กิจกรรม</th>
+                                <th>รายละเอียดกิจกรรม</th>
+                                <th style="width: 125px; text-align: center;">ช่องทาง / IP</th>
+                                <th style="width: 100px; text-align: center;">สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogTableBody">
+                            <!-- Dynamically Rendered -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Table Footer / Pagination -->
+                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: #fafbfc; border-top: 1px solid #f1f5f9; flex-wrap: wrap; gap: 0.75rem;">
+                    <div style="font-size: 0.85rem; color: #64748b;" id="auditPaginationInfo">
+                        แสดง 0 - 0 จาก 0 รายการ
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: #64748b;">
+                            <span>แสดงหน้าละ:</span>
+                            <select id="auditPageSizeSelect" onchange="changeAuditLogPageSize(this.value)" style="padding: 3px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; background: #fff;">
+                                <option value="15">15</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div id="auditPaginationButtons" style="display: flex; gap: 4px; align-items: center;">
+                            <!-- Pagination buttons -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL: เพิ่ม / แก้ไข กำลังพล (PERSONNEL MODAL)
+         ========================================================================== -->
+    <div class="modal-backdrop" id="personModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div class="modal-title" id="personModalTitle">เพิ่มกำลังพลใหม่</div>
+                <button class="modal-close" onclick="closePersonModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="personFormId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pRank">ยศ / คำนำหน้า</label>
+                        <input type="text" id="pRank" placeholder="เช่น ร.ท., น.ต., พ.อ.อ., นาย">
+                    </div>
+                    <div class="form-group">
+                        <label for="pNameInp">ชื่อ - นามสกุล *</label>
+                        <input type="text" id="pNameInp" placeholder="เช่น สมชาย  ใจดี" oninput="checkDuplicatePersonName()">
+                        <div id="pNameDuplicateHint" style="font-size: 0.775rem; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 5px 8px; margin-top: 5px; display: none; line-height: 1.35;"></div>
+                    </div>
+                    <div class="form-group full">
+                        <label for="pPosInp">ตำแหน่ง</label>
+                        <input type="text" id="pPosInp" placeholder="เช่น ประจำ ผวสม.กกศ.ฯ">
+                    </div>
+                    <div class="form-group full">
+                        <label for="pPosInp2">ตำแหน่ง (ต่อ / บรรทัดที่ 2 - ถ้ามี)</label>
+                        <input type="text" id="pPosInp2" placeholder="เช่น ช่วยราชการ ผวสม.กกศ.รร.จอ.ยศ.ทอ.">
+                    </div>
+                    <div class="form-group full">
+                        <label for="pUnitInp">สังกัด / หน่วยงาน</label>
+                        <input type="text" id="pUnitInp" placeholder="เช่น ผวสม.กกศ.รร.จอ.ยศ.ทอ.">
+                    </div>
+                    <div class="form-group">
+                        <label for="pAnnualInp">สิทธิวันลาปีนี้ (วัน)</label>
+                        <input type="number" id="pAnnualInp" value="10" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="pAccInp">วันลาสะสม (วัน)</label>
+                        <input type="number" id="pAccInp" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="pPhoneInp">หมายเลขโทรศัพท์</label>
+                        <input type="text" id="pPhoneInp" placeholder="08x-xxx-xxxx">
+                    </div>
+                    <div class="form-group">
+                        <label for="pPronounInp">คำสรรพนาม</label>
+                        <select id="pPronounInp">
+                            <option value="กระผม">กระผม</option>
+                            <option value="ดิฉัน">ดิฉัน</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pHomeNoInp">บ้านเลขที่</label>
+                        <input type="text" id="pHomeNoInp" placeholder="เช่น 12/3">
+                    </div>
+                    <div class="form-group">
+                        <label for="pRoadInp">ถนน</label>
+                        <input type="text" id="pRoadInp" placeholder="เช่น พหลโยธิน">
+                    </div>
+                    <div class="form-group">
+                        <label for="pSubdistrictInp">ตำบล / แขวง</label>
+                        <input type="text" id="pSubdistrictInp" placeholder="เช่น คลองถนน">
+                    </div>
+                    <div class="form-group">
+                        <label for="pDistrictInp">อำเภอ / เขต</label>
+                        <input type="text" id="pDistrictInp" placeholder="เช่น สายไหม">
+                    </div>
+                    <div class="form-group full">
+                        <label for="pProvinceInp">จังหวัด</label>
+                        <input type="text" id="pProvinceInp" placeholder="เช่น กรุงเทพมหานคร">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePersonModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="savePersonFromModal()">บันทึกข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL: เพิ่ม / แก้ไข ผู้ใช้งานและสิทธิ์ (USER MODAL)
+         ========================================================================== -->
+    <div class="modal-backdrop" id="userModal">
+        <div class="modal-dialog" style="max-width: 640px;">
+            <div class="modal-header">
+                <div class="modal-title" id="userModalTitle">เพิ่มผู้ใช้งานใหม่</div>
+                <button class="modal-close" onclick="closeUserModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="userFormId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="uUsernameInp">ชื่อผู้ใช้งาน (Username) *</label>
+                        <input type="text" id="uUsernameInp" placeholder="เช่น officer1, somchai" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="uPasswordInp">รหัสผ่าน (Password) *</label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="uPasswordInp" placeholder="กำหนดรหัสผ่าน" style="padding-right: 40px; width: 100%;">
+                            <button type="button" id="btnToggleUserPass" onclick="togglePasswordVisibility('uPasswordInp', 'btnToggleUserPass')" 
+                                style="position: absolute; right: 8px; background: none; border: none; cursor: pointer; font-size: 1rem; color: #64748b;" title="ดู/ซ่อนรหัสผ่าน">
+                                👁️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group full">
+                        <label for="uPersonSelect">ผูกกับกำลังพลในระบบ (เลือกเพื่อดึงชื่อและตำแหน่งอัตโนมัติ)</label>
+                        <select id="uPersonSelect" onchange="onUserPersonSelectChange()">
+                            <option value="">-- ไม่ผูกกับกำลังพล (พิมพ์ชื่อเอง) --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="uNameInp">ชื่อ - นามสกุล *</label>
+                        <input type="text" id="uNameInp" placeholder="เช่น ร.ท.สมชาย ใจดี">
+                    </div>
+                    <div class="form-group">
+                        <label for="uRoleInp">บทบาท (Role) *</label>
+                        <select id="uRoleInp" onchange="onUserRoleChange()">
+                            <option value="user">ผู้ใช้งานทั่วไป (กำหนดสิทธิ์เฉพาะหน้า)</option>
+                            <option value="admin">ผู้ดูแลระบบ (Admin - สิทธิ์ทุกหน้า)</option>
+                            <option value="superadmin">ผู้ดูแลระบบระดับสูง (Superadmin - สิทธิ์สูงสุด)</option>
+                        </select>
+                    </div>
+                    <div class="form-group full" style="margin-top: 0.25rem;">
+                        <label class="status-toggle-card" style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; cursor: pointer; margin: 0;">
+                            <input type="checkbox" id="uIsLockedInp" style="width: 18px; height: 18px; accent-color: #e11d48; cursor: pointer;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.9rem; color: #be123c;">🔒 ล็อคการใช้งานบัญชีนี้ (ระงับสิทธิ์เข้าสู่ระบบ)</div>
+                                <div style="font-size: 0.78rem; color: #9f1239;">เมื่อเปิดใช้งาน ผู้ใช้บัญชีนี้จะไม่สามารถล็อกอินเข้าสู่ระบบได้ชั่วคราว</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Permission Checkboxes Section -->
+                <div id="userPermSection" style="margin-top: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <label style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0;">
+                            กำหนดสิทธิ์การมองเห็นและเข้าถึงหน้า (เลือกหน้าที่อนุญาตให้เห็น):
+                        </label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllUserPermissions(true)">เลือกทั้งหมด</button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAllUserPermissions(false)">ล้าง</button>
+                        </div>
+                    </div>
+                    <div class="perm-grid" id="permCheckboxesGrid">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserModal()">ยกเลิก</button>
+                <button class="btn btn-primary" onclick="saveUserFromModal()">💾 บันทึกผู้ใช้งาน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODAL: เข้าสู่ระบบ (LOGIN MODAL)
+         ========================================================================== -->
+    <div class="sky-login-backdrop" id="loginModal" style="background-image: url('assets/login_clouds_bg.jpg'); display: none;">
+        <!-- Frosted Glassmorphism Login Card (Translucent White with System Title & Logo) -->
+        <div class="sky-login-card">
+            <!-- Modal Close button (hidden during initial login, available if modal opened while logged in) -->
+            <button type="button" class="sky-close-btn" id="loginModalCloseBtn" onclick="closeLoginModal()" title="ปิดหน้าต่าง">✕</button>
+
+            <!-- System Brand Header: Logo & System Title -->
+            <div class="sky-brand-header">
+                <div class="sky-brand-logo-wrap" id="loginBrandLogo">
+                    <div class="login-logo-emblem">
+                        <svg viewBox="0 0 100 100" class="login-rtaf-wings" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="rtafGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#0284c7" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 42 C24 32, 40 38, 48 50 C40 45, 26 48, 16 56 C24 53, 34 55, 46 62 C34 62, 22 66, 18 74 C30 68, 42 70, 50 78 C58 70, 70 68, 82 74 C78 66, 66 62, 54 62 C66 55, 76 53, 84 56 C74 48, 60 45, 52 50 C60 38, 76 32, 88 42 C72 36, 56 42, 50 48 C44 42, 28 36, 12 42 Z" fill="url(#rtafGold)" opacity="0.9" />
+                            <circle cx="50" cy="50" r="22" fill="#084277" stroke="#ffffff" stroke-width="2.5" />
+                            <path d="M42 38 h12 l6 6 v18 h-18 z" fill="#ffffff" />
+                            <path d="M54 38 v6 h6" fill="#38bdf8" />
+                            <line x1="45" y1="48" x2="55" y2="48" stroke="#084277" stroke-width="1.5" stroke-linecap="round" />
+                            <line x1="45" y1="52" x2="55" y2="52" stroke="#084277" stroke-width="1.5" stroke-linecap="round" />
+                            <line x1="45" y1="56" x2="52" y2="56" stroke="#084277" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="sky-system-title" id="loginSystemTitle">ระบบสารสนเทศบริหารจัดการการลาอิเล็กทรอนิกส์</h1>
+                <div class="sky-system-subtitle" id="loginSystemSubtitle">งานสารบรรณและทะเบียนกำลังพล • ผวสม.กกศ.รร.จอ.ยศ.ทอ.</div>
+            </div>
+
+            <!-- Current Logged in summary (shown only when switching accounts) -->
+            <div class="login-current-box" id="loginCurrentBox" style="display: none;">
+                <div style="font-size: 0.76rem; color: #084277; opacity: 0.85;">เข้าสู่ระบบอยู่ในขณะนี้:</div>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px;">
+                    <div>
+                        <span style="font-weight: 700; color: #084277; font-size: 0.85rem;" id="loginCurName">ผู้ดูแลระบบ</span>
+                        <span style="font-size: 0.75rem; color: #0369a1;" id="loginCurUsername">(@admin)</span>
+                    </div>
+                    <button type="button" class="btn-sky-subtle-logout" onclick="logoutUser()" title="ออกจากระบบ">
+                        ออกจากระบบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Login Form (Clean Pill Inputs & Centered Login Button) -->
+            <form id="loginForm" class="sky-login-form" onsubmit="event.preventDefault(); submitLogin();">
+                <div class="sky-input-group">
+                    <input type="text" id="loginUsername" class="sky-input" placeholder="ชื่อผู้ใช้งาน (Username เช่น admin หรือ Kornphong)" autocomplete="username" value="" required>
+                </div>
+                <div class="sky-input-group">
+                    <input type="password" id="loginPassword" class="sky-input" placeholder="รหัสผ่าน (Password เช่น admin123)" autocomplete="current-password" value="" required>
+                    <button type="button" id="btnToggleLoginPass" class="sky-pass-toggle" onclick="togglePasswordVisibility('loginPassword', 'btnToggleLoginPass')" title="ดู/ซ่อนรหัสผ่าน">
+                        👁️
+                    </button>
+                </div>
+
+                <!-- Forgot Password? Link -->
+                <div class="sky-forgot-wrap">
+                    <a href="javascript:void(0)" class="sky-forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
+                </div>
+
+                <!-- Login Alert / Error Message Box -->
+                <div id="loginAlertBox" class="sky-login-alert" style="display: none;"></div>
+
+                <!-- Login Button (Deep Navy Blue Pill) -->
+                <button type="submit" class="sky-login-btn">
+                    Login
+                </button>
+            </form>
+
+            <!-- Forgot Password Form (แก้ไข / รีเซ็ตรหัสผ่าน) -->
+            <form id="forgotPasswordForm" class="sky-login-form" style="display: none;" onsubmit="event.preventDefault(); submitForgotPassword();">
+                <div class="sky-forgot-title-box">
+                    <div style="font-size: 1.12rem; font-weight: 700; color: #084277; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <span>🔑</span>
+                        <span>แก้ไข / รีเซ็ตรหัสผ่าน</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: #0369a1; margin-top: 2px;">
+                        ระบุชื่อผู้ใช้งานและกำหนดรหัสผ่านใหม่
+                    </div>
+                </div>
+
+                <div class="sky-input-group">
+                    <input type="text" id="forgotUsername" class="sky-input" placeholder="ชื่อผู้ใช้งาน (Username เช่น admin)" autocomplete="username" required>
+                </div>
+
+                <div class="sky-input-group">
+                    <input type="password" id="forgotNewPassword" class="sky-input" placeholder="รหัสผ่านใหม่ (New Password)" autocomplete="new-password" required>
+                    <button type="button" id="btnToggleForgotNewPass" class="sky-pass-toggle" onclick="togglePasswordVisibility('forgotNewPassword', 'btnToggleForgotNewPass')" title="ดู/ซ่อนรหัสผ่าน">
+                        👁️
+                    </button>
+                </div>
+
+                <div class="sky-input-group">
+                    <input type="password" id="forgotConfirmPassword" class="sky-input" placeholder="ยืนยันรหัสผ่านใหม่ (Confirm)" autocomplete="new-password" required>
+                    <button type="button" id="btnToggleForgotConfPass" class="sky-pass-toggle" onclick="togglePasswordVisibility('forgotConfirmPassword', 'btnToggleForgotConfPass')" title="ดู/ซ่อนรหัสผ่าน">
+                        👁️
+                    </button>
+                </div>
+
+                <button type="submit" class="sky-login-btn" style="min-width: 175px; margin-top: 8px; margin-bottom: 16px;">
+                    บันทึกรหัสผ่านใหม่
+                </button>
+
+                <div class="sky-forgot-wrap" style="margin-bottom: 0;">
+                    <a href="javascript:void(0)" class="sky-forgot-link" onclick="toggleForgotPassView(false)">
+                        ← กลับสู่หน้าเข้าสู่ระบบ (Back to Login)
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Developer Credit Badge on Login Screen -->
+        <div class="sky-login-credit-badge">
+            <span class="sky-credit-author">พัฒนาและดูแลระบบโดย พันจ่าอากาศเอก กรณ์พงษ์ สุขเกียรติ์สกุล</span>
+            <span class="sky-credit-sub">© 2026 RTAF Web Application</span>
+        </div>
+    </div>
+
+    <!-- Global Website Footer with Developer Credit -->
+    <footer class="app-global-footer">
+        <div class="footer-credit-dev">พัฒนาและดูแลระบบโดย พันจ่าอากาศเอก กรณ์พงษ์ สุขเกียรติ์สกุล</div>
+        <div class="footer-credit-copy">© 2026 RTAF Web Application</div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Thai Month Picker Popover Component -->
+    <div class="thai-month-popover" id="thaiMonthPopover">
+        <div class="tmp-header">
+            <button type="button" class="tmp-nav-btn" onclick="navThaiMonthYear(-1)" title="ปีก่อนหน้า">‹</button>
+            <div class="tmp-year-title" id="tmpCurrentYearTitle">พ.ศ. ๒๕๖๙ (2026)</div>
+            <button type="button" class="tmp-nav-btn" onclick="navThaiMonthYear(1)" title="ปีถัดไป">›</button>
+        </div>
+        <div class="tmp-months-grid">
+            <button type="button" class="tmp-month-btn" data-month="1" onclick="selectThaiMonth(1)">ม.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="2" onclick="selectThaiMonth(2)">ก.พ.</button>
+            <button type="button" class="tmp-month-btn" data-month="3" onclick="selectThaiMonth(3)">มี.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="4" onclick="selectThaiMonth(4)">เม.ย.</button>
+            <button type="button" class="tmp-month-btn" data-month="5" onclick="selectThaiMonth(5)">พ.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="6" onclick="selectThaiMonth(6)">มิ.ย.</button>
+            <button type="button" class="tmp-month-btn" data-month="7" onclick="selectThaiMonth(7)">ก.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="8" onclick="selectThaiMonth(8)">ส.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="9" onclick="selectThaiMonth(9)">ก.ย.</button>
+            <button type="button" class="tmp-month-btn" data-month="10" onclick="selectThaiMonth(10)">ต.ค.</button>
+            <button type="button" class="tmp-month-btn" data-month="11" onclick="selectThaiMonth(11)">พ.ย.</button>
+            <button type="button" class="tmp-month-btn" data-month="12" onclick="selectThaiMonth(12)">ธ.ค.</button>
+        </div>
+        <div class="tmp-footer">
+            <button type="button" class="tmp-footer-btn today" onclick="selectThaiMonthThisMonth()">เดือนปัจจุบัน</button>
+            <button type="button" class="tmp-footer-btn clear" onclick="clearActiveThaiMonthPicker()">ล้างค่า</button>
+            <button type="button" class="tmp-footer-btn" onclick="closeThaiMonthPicker()">ปิด</button>
+        </div>
+    </div>
+
+    <!-- Supabase Cloud Database Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js?v=2.4"></script>
+
+    <!-- JavaScript Application Logic -->
+    <script src="js/app.js?v=3.0"></script>
+</body>
+</html>
