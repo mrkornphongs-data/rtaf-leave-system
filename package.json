@@ -1,0 +1,10 @@
+{
+  "name": "leave-management-system",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build-obfuscate.js"
+  },
+  "devDependencies": {
+    "javascript-obfuscator": "^5.9.0"
+  }
+}

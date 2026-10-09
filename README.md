@@ -28,18 +28,43 @@
    - ซิงค์ข้อมูลข้ามเครื่องแบบ 2-way real-time
    - ทำงานแบบ Hybrid (ออฟไลน์ใช้ LocalStorage / ออนไลน์เชื่อมต่อ Supabase)
 
+6. **ระบบความปลอดภัยและการป้องกันคัดลอก (Security & Anti-Copy Protection)**
+   - ปิดการคลิกขวา (Disable Context Menu)
+   - ปิดการใช้งานปุ่มคีย์ลัด DevTools (F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S)
+   - ปิดการลากคลุมข้อความ (user-select: none) โดยยกเว้นช่องกรอกข้อมูลให้พิมพ์งานได้ตามปกติ
+   - ทำ **Code Obfuscation** บิดเบือนโครงสร้างและเข้ารหัสโค้ด JavaScript ในไฟล์ใช้งานจริง (`js/`)
+
 ## 📁 โครงสร้างโปรเจกต์ (Project Structure)
 
 ```
 ├── index.html              # หน้าหลักระบบวันลา
+├── build-obfuscate.js      # สคริปต์ทำ Code Obfuscation
+├── package.json            # การตั้งค่าคำสั่ง build และ dependencies
 ├── css/
 │   └── style.css           # สไตล์ชีทและการจัดหน้าแบบฟอร์ม A4
-├── js/
-│   ├── app.js              # ตรรกะการทำงานหลักของระบบ
-│   └── supabase-client.js  # โมดูลเชื่อมต่อ Supabase Cloud Database
+├── src/                    # 🔒 ซอร์สโค้ดต้นฉบับ (Original Source Files)
+│   └── js/
+│       ├── app.js          # ซอร์สโค้ดตรรกะหลักของระบบ
+│       ├── security.js     # ซอร์สโค้ดโมดูลความปลอดภัย
+│       └── supabase-client.js # ซอร์สโค้ดเชื่อมต่อ Supabase
+├── js/                     # 🛡️ โค้ดที่ผ่าน Obfuscation แล้วสำหรับรันจริงบนเว็บ
+│   ├── app.js              # โค้ดหลักที่เข้ารหัสแล้ว
+│   ├── security.js         # โมดูลความปลอดภัยที่เข้ารหัสแล้ว
+│   └── supabase-client.js  # โมดูล Supabase ที่เข้ารหัสแล้ว
 ├── supabase_schema.sql     # สคริปต์สร้าง Database Schema & Table
 └── README.md
 ```
+
+## 🛠️ การแก้ไขโค้ดและ Build Obfuscation
+
+เมื่อต้องการพัฒนาหรือแก้ไขโค้ด:
+1. แก้ไขไฟล์ต้นฉบับในโฟลเดอร์ `src/js/`
+2. รันคำสั่ง Obfuscate เพื่ออัปเดตไฟล์ใน `js/`:
+   ```bash
+   npm run build
+   # หรือ
+   node build-obfuscate.js
+   ```
 
 ## 🚀 การติดตั้งและใช้งาน (Getting Started)
 
@@ -53,3 +78,4 @@
 3. (ตัวเลือก) เชื่อมต่อ Supabase:
    - นำโค้ดจาก `supabase_schema.sql` ไปรันใน SQL Editor บน Supabase Dashboard
    - นำ Project URL และ Anon Key มากรอกในหน้าการตั้งค่าของระบบ
+
