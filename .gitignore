@@ -3,6 +3,7 @@ scratch/
 temp_*
 *.tmp
 *.log
+*.zip
 
 # Operating System files
 Thumbs.db
