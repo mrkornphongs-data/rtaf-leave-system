@@ -4738,5 +4738,24 @@ body.is-authenticated .sky-close-btn:hover {
   background: #dbeafe;
 }
 
+/* ==========================================================================
+   CODE & CONTENT COPY PROTECTION
+   ========================================================================== */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* อนุญาตให้เลือก/คลุมข้อความได้เฉพาะในช่องกรอกข้อมูล เพื่อให้พิมพ์งานได้ตามปกติ */
+input, textarea, select, [contenteditable="true"], .allow-select {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+
 
 
