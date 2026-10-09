@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - ระบบเขียนใบลาอิเล็กทรอนิกส์</title>
+    <script>
+        // Clear active session and redirect to index.html with login flag
+        try {
+            localStorage.removeItem('leave_sys_current_user');
+            sessionStorage.removeItem('leave_sys_current_user');
+        } catch(e) {}
+        window.location.replace('index.html?login=true');
+    </script>
+</head>
+<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #38bdf8; color: white;">
+    <div style="text-align: center;">
+        <h2 style="margin-bottom: 8px;">กำลังเข้าสู่หน้าเข้าสู่ระบบ...</h2>
+        <p style="opacity: 0.9;">หากระบบไม่เปลี่ยนหน้าอัตโนมัติ <a href="index.html?login=true" style="color: white; font-weight: bold; text-decoration: underline;">คลิกที่นี่</a></p>
+    </div>
+</body>
+</html>
